@@ -32,7 +32,8 @@ src/pages/<group>/<module>/
 - 详情使用 `ProDescriptions`。
 - `ProTable` 内置 search 能表达的查询，不单独拆 `SearchForm`；复杂查询体验才拆分。
 - `src/components/biz/` 只保留状态 Tag、权限按钮、字典 Select 等薄封装，不能演化为 schema renderer、低代码 CRUD 引擎或独立设计系统。
-- 模块生成器 `npm run gen:module` 只生成文件并输出路由片段，不自动改 `config/routes.ts`。
+- 模块生成器 `npm run gen:module` 只生成文件并输出路由片段，不自动改 `config/routes.ts`；中文标题用 `--title`，英文标题用 `--title-en`，未传 `--title-en` 时从模块名推导。
+- 当前可见 CRUD 标准样例是 `/system/example`；上游 Pro Demo 页面不作为业务开发模板。
 
 ## API 与适配器
 
@@ -51,8 +52,11 @@ src/pages/<group>/<module>/
 
 - 路由级权限使用 `config/routes.ts` 的 `access` 字段，对应 `src/access.ts`。
 - 当前内置 `canAdmin`，来源是 `initialState.currentUser.access === 'admin'`。
-- 按钮或操作权限使用 `BizPermissionButton` 的 `permissionCode` 预留。
+- 按钮或操作权限统一用 `BizPermissionButton permissionCode` 标注。
 - `permissionCode` 建议命名为 `<domain>:<module>:<action>`，例如 `system:example:create`。
+- `BizPermissionButton` 当前支持轻量适配：如果 `currentUser.permissions` 或 `currentUser.permissionCodes` 是字符串数组，则按 `permissionCode` 判断；如果后端尚未提供权限集合，则默认放行。
+- `currentUser.access === 'admin'` 默认拥有所有按钮权限。
+- `hiddenWhenDenied` 用于无权限时隐藏按钮；不隐藏时按钮会 disabled。
 - 真实业务项目接入权限时，优先改权限适配层、`access.ts` 或 `BizPermissionButton` 内部逻辑，不在页面里散落权限判断。
 
 ## 国际化
@@ -63,10 +67,12 @@ src/pages/<group>/<module>/
 - 用户可以通过右上角语言菜单切换语言。
 - 如果业务项目只使用中文，可以只保留 `zh-CN` 并把默认语言改为 `zh-CN`；当可用语言只有一套时，语言切换入口会自动隐藏。
 - 新业务代码默认使用 `useIntl().formatMessage({ id, defaultMessage })`，至少维护 `en-US` 和 `zh-CN` 两套文案。
+- 模块生成器会输出页面 locale key 清单；生成新模块后必须补充 `src/locales/en-US/pages.ts`、`src/locales/zh-CN/pages.ts` 和对应 `menu.*` key。
 
 ## 代码质量
 
 - TypeScript strict，不使用 `any` 绕过类型问题；优先 `unknown`、类型收窄或明确的本地接口。
+- Biome 已开启 `noExplicitAny`；自动生成目录 `src/services/openapi/` 除外。
 - Biome 是唯一格式化和 lint 工具，不引入 ESLint 或 Prettier。
 - 不新增生产依赖，除非任务确实需要并在交付说明中解释原因。
 - 不随意修改全局 Layout、主题、菜单风格、登录流程或 request runtime。

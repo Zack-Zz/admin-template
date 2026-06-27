@@ -4,7 +4,8 @@ import {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
-import { __ModuleName___STATUS_OPTIONS } from '../constants';
+import { useIntl } from '@umijs/max';
+import { __ModuleName___STATUS_TAG_OPTIONS } from '../constants';
 import type { __ModuleName__FormValues, __ModuleName__Item } from '../types';
 
 interface __ModuleName__FormModalProps {
@@ -24,10 +25,31 @@ const __ModuleName__FormModal = ({
   onCancel,
   onSubmit,
 }: __ModuleName__FormModalProps) => {
+  const intl = useIntl();
+  const statusOptions = __ModuleName___STATUS_TAG_OPTIONS.map((item) => ({
+    ...item,
+    label: intl.formatMessage({
+      id:
+        item.value === 1
+          ? 'pages.__groupName__.__modulePath__.status.enabled'
+          : 'pages.__groupName__.__modulePath__.status.disabled',
+      defaultMessage: String(item.label),
+    }),
+  }));
+
   return (
     <ModalForm<__ModuleName__FormValues>
       key={values?.id ?? 'create'}
-      title={mode === 'create' ? '新增__moduleTitle__' : '编辑__moduleTitle__'}
+      title={intl.formatMessage({
+        id:
+          mode === 'create'
+            ? 'pages.__groupName__.__modulePath__.form.createTitle'
+            : 'pages.__groupName__.__modulePath__.form.editTitle',
+        defaultMessage:
+          mode === 'create'
+            ? 'Create __moduleTitleEn__'
+            : 'Edit __moduleTitleEn__',
+      })}
       open={open}
       initialValues={values ?? { status: 1 }}
       modalProps={{
@@ -48,37 +70,99 @@ const __ModuleName__FormModal = ({
     >
       <ProFormText
         name="name"
-        label="名称"
-        rules={[{ required: true, message: '请输入名称' }]}
+        label={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.field.name',
+          defaultMessage: 'Name',
+        })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.validation.nameRequired',
+              defaultMessage: 'Please enter name',
+            }),
+          },
+        ]}
         fieldProps={{ maxLength: 40 }}
-        placeholder="请输入名称"
+        placeholder={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.placeholder.name',
+          defaultMessage: 'Please enter name',
+        })}
       />
       <ProFormText
         name="code"
-        label="编码"
-        rules={[{ required: true, message: '请输入编码' }]}
+        label={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.field.code',
+          defaultMessage: 'Code',
+        })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.validation.codeRequired',
+              defaultMessage: 'Please enter code',
+            }),
+          },
+        ]}
         fieldProps={{ maxLength: 40 }}
-        placeholder="请输入编码"
+        placeholder={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.placeholder.code',
+          defaultMessage: 'Please enter code',
+        })}
       />
       <ProFormSelect
         name="status"
-        label="状态"
-        rules={[{ required: true, message: '请选择状态' }]}
-        options={__ModuleName___STATUS_OPTIONS}
-        placeholder="请选择状态"
+        label={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.field.status',
+          defaultMessage: 'Status',
+        })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.validation.statusRequired',
+              defaultMessage: 'Please select status',
+            }),
+          },
+        ]}
+        options={statusOptions}
+        placeholder={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.placeholder.status',
+          defaultMessage: 'Please select status',
+        })}
       />
       <ProFormText
         name="owner"
-        label="负责人"
-        rules={[{ required: true, message: '请输入负责人' }]}
+        label={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.field.owner',
+          defaultMessage: 'Owner',
+        })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.validation.ownerRequired',
+              defaultMessage: 'Please enter owner',
+            }),
+          },
+        ]}
         fieldProps={{ maxLength: 40 }}
-        placeholder="请输入负责人"
+        placeholder={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.placeholder.owner',
+          defaultMessage: 'Please enter owner',
+        })}
       />
       <ProFormTextArea
         name="description"
-        label="描述"
+        label={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.field.description',
+          defaultMessage: 'Description',
+        })}
         fieldProps={{ maxLength: 200, showCount: true }}
-        placeholder="请输入描述"
+        placeholder={intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.placeholder.description',
+          defaultMessage: 'Please enter description',
+        })}
       />
     </ModalForm>
   );

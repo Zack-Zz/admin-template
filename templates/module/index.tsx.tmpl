@@ -1,5 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { type ActionType, PageContainer } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
 import { message } from 'antd';
 import { useRef, useState } from 'react';
 import { BizPermissionButton } from '@/components';
@@ -14,6 +15,7 @@ import {
 import type { __ModuleName__FormValues, __ModuleName__Item } from './types';
 
 const __ModuleName__Page = () => {
+  const intl = useIntl();
   const actionRef = useRef<ActionType | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [saving, setSaving] = useState(false);
@@ -31,10 +33,20 @@ const __ModuleName__Page = () => {
     try {
       if (currentRecord) {
         await update__ModuleName__(currentRecord.id, values);
-        messageApi.success('__moduleTitle__已更新');
+        messageApi.success(
+          intl.formatMessage({
+            id: 'pages.__groupName__.__modulePath__.message.updated',
+            defaultMessage: '__moduleTitleEn__ updated',
+          }),
+        );
       } else {
         await create__ModuleName__(values);
-        messageApi.success('__moduleTitle__已新增');
+        messageApi.success(
+          intl.formatMessage({
+            id: 'pages.__groupName__.__modulePath__.message.created',
+            defaultMessage: '__moduleTitleEn__ created',
+          }),
+        );
       }
       closeForm();
       await actionRef.current?.reload();
@@ -45,7 +57,12 @@ const __ModuleName__Page = () => {
 
   const handleDelete = async (record: __ModuleName__Item) => {
     await delete__ModuleName__(record.id);
-    messageApi.success('__moduleTitle__已删除');
+    messageApi.success(
+      intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.message.deleted',
+        defaultMessage: '__moduleTitleEn__ deleted',
+      }),
+    );
     await actionRef.current?.reload();
   };
 
@@ -57,6 +74,7 @@ const __ModuleName__Page = () => {
         toolBarRender={() => [
           <BizPermissionButton
             key="create"
+            hiddenWhenDenied
             permissionCode="__groupName__:__modulePath__:create"
             type="primary"
             icon={<PlusOutlined />}
@@ -65,7 +83,10 @@ const __ModuleName__Page = () => {
               setFormOpen(true);
             }}
           >
-            新增
+            {intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.action.create',
+              defaultMessage: 'New',
+            })}
           </BizPermissionButton>,
         ]}
         onView={(record) => {

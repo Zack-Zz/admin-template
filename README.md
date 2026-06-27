@@ -99,7 +99,7 @@ The scaffold keeps Umi Max i18n enabled and maintains `en-US` and `zh-CN` by def
 
 ## Permissions
 
-The scaffold keeps a lightweight permission convention. Route access uses `config/routes.ts` plus `src/access.ts`; the built-in `canAdmin` rule checks `currentUser.access === 'admin'`. Action permissions can be marked with `BizPermissionButton permissionCode`, using names such as `system:example:create`.
+The scaffold keeps a lightweight permission convention. Route access uses `config/routes.ts` plus `src/access.ts`; the built-in `canAdmin` rule checks `currentUser.access === 'admin'`. Action permissions are marked with `BizPermissionButton permissionCode`, using names such as `system:example:create`. If a backend adapter provides `currentUser.permissions` or `currentUser.permissionCodes`, the button checks them; otherwise scaffold demos allow actions by default.
 
 ## Verification
 

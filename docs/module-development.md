@@ -30,6 +30,8 @@ Use the generator:
 npm run gen:module -- --name organization --group system --title 组织管理
 ```
 
+Use `--title-en Organization` when the English module title cannot be inferred cleanly from `--name`.
+
 This creates:
 
 ```text
@@ -42,13 +44,14 @@ src/pages/system/organization/
 ```
 
 The generator does not edit routes automatically. Add the route manually in `config/routes.ts` after reviewing the target menu group.
+It also prints the page and menu locale keys that must be added to `src/locales/en-US/` and `src/locales/zh-CN/`.
 
 ## Route Example
 
 ```ts
 {
   path: '/system/organization',
-  name: '组织管理',
+  name: 'system.organization',
   component: './system/organization',
 }
 ```

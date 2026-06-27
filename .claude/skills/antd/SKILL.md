@@ -66,7 +66,7 @@ Always prefer `--format json` so Codex can read structured output.
 - Do not reimplement ProComponents features with large custom React/CSS code.
 - Do not write large page-level CSS. Prefer layout props, ProComponents patterns, Ant Design tokens, `antd-style`, and small local styles.
 - Keep business wrappers in `src/components/biz/` thin. They must not become a schema renderer, design system, or low-code CRUD engine.
-- Do not hand-edit `src/services/ant-design-pro/`.
+- Do not hand-edit `src/services/openapi/`.
 - Do not invent backend URLs while wiring antd tables/forms. Use existing generated services, page `service.ts`, or a clearly local mock promise with TODO.
 
 ## Decision Guide

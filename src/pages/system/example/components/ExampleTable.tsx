@@ -1,9 +1,9 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Button, Popconfirm, Space } from 'antd';
+import { Popconfirm, Space } from 'antd';
 import type { ReactNode, RefObject } from 'react';
-import { BizStatusTag } from '@/components';
+import { BizPermissionButton, BizStatusTag } from '@/components';
 import { DEFAULT_PAGE_SIZE, EXAMPLE_STATUS_TAG_OPTIONS } from '../constants';
 import { queryExampleList } from '../service';
 import type { ExampleItem, ExampleQuery, ExampleStatus } from '../types';
@@ -127,18 +127,28 @@ const ExampleTable = ({
       valueType: 'option',
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => onView(record)}>
+          <BizPermissionButton
+            hiddenWhenDenied
+            permissionCode="system:example:view"
+            type="link"
+            onClick={() => onView(record)}
+          >
             {intl.formatMessage({
               id: 'pages.system.example.action.view',
               defaultMessage: 'View',
             })}
-          </Button>
-          <Button type="link" onClick={() => onEdit(record)}>
+          </BizPermissionButton>
+          <BizPermissionButton
+            hiddenWhenDenied
+            permissionCode="system:example:update"
+            type="link"
+            onClick={() => onEdit(record)}
+          >
             {intl.formatMessage({
               id: 'pages.system.example.action.edit',
               defaultMessage: 'Edit',
             })}
-          </Button>
+          </BizPermissionButton>
           <Popconfirm
             title={intl.formatMessage({
               id: 'pages.system.example.delete.title',
@@ -156,12 +166,17 @@ const ExampleTable = ({
             okButtonProps={{ danger: true }}
             onConfirm={() => onDelete(record)}
           >
-            <Button danger type="link">
+            <BizPermissionButton
+              danger
+              hiddenWhenDenied
+              permissionCode="system:example:delete"
+              type="link"
+            >
               {intl.formatMessage({
                 id: 'pages.system.example.action.delete',
                 defaultMessage: 'Delete',
               })}
-            </Button>
+            </BizPermissionButton>
           </Popconfirm>
         </Space>
       ),

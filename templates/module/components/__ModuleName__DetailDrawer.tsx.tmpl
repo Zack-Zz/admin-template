@@ -2,6 +2,7 @@ import {
   ProDescriptions,
   type ProDescriptionsItemProps,
 } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
 import { Drawer } from 'antd';
 import { BizStatusTag } from '@/components';
 import { __ModuleName___STATUS_TAG_OPTIONS } from '../constants';
@@ -18,32 +19,79 @@ const __ModuleName__DetailDrawer = ({
   record,
   onClose,
 }: __ModuleName__DetailDrawerProps) => {
+  const intl = useIntl();
+  const statusOptions = __ModuleName___STATUS_TAG_OPTIONS.map((item) => ({
+    ...item,
+    label: intl.formatMessage({
+      id:
+        item.value === 1
+          ? 'pages.__groupName__.__modulePath__.status.enabled'
+          : 'pages.__groupName__.__modulePath__.status.disabled',
+      defaultMessage: String(item.label),
+    }),
+  }));
   const columns: ProDescriptionsItemProps<__ModuleName__Item>[] = [
-    { title: '名称', dataIndex: 'name' },
-    { title: '编码', dataIndex: 'code' },
     {
-      title: '状态',
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.name',
+        defaultMessage: 'Name',
+      }),
+      dataIndex: 'name',
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.code',
+        defaultMessage: 'Code',
+      }),
+      dataIndex: 'code',
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.status',
+        defaultMessage: 'Status',
+      }),
       dataIndex: 'status',
       render: (_, entity) => (
-        <BizStatusTag
-          value={entity.status}
-          options={__ModuleName___STATUS_TAG_OPTIONS}
-        />
+        <BizStatusTag value={entity.status} options={statusOptions} />
       ),
     },
-    { title: '负责人', dataIndex: 'owner' },
     {
-      title: '描述',
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.owner',
+        defaultMessage: 'Owner',
+      }),
+      dataIndex: 'owner',
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.description',
+        defaultMessage: 'Description',
+      }),
       dataIndex: 'description',
       render: (_, entity) => entity.description || '-',
     },
-    { title: '创建时间', dataIndex: 'createdAt' },
-    { title: '更新时间', dataIndex: 'updatedAt' },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.createdAt',
+        defaultMessage: 'Created At',
+      }),
+      dataIndex: 'createdAt',
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.updatedAt',
+        defaultMessage: 'Updated At',
+      }),
+      dataIndex: 'updatedAt',
+    },
   ];
 
   return (
     <Drawer
-      title="__moduleTitle__详情"
+      title={intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.detail.title',
+        defaultMessage: '__moduleTitleEn__ Details',
+      })}
       open={open}
       onClose={onClose}
       size={600}

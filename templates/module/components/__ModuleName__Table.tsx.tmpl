@@ -1,11 +1,11 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, Popconfirm, Space } from 'antd';
+import { useIntl } from '@umijs/max';
+import { Popconfirm, Space } from 'antd';
 import type { ReactNode, RefObject } from 'react';
-import { BizStatusTag } from '@/components';
+import { BizPermissionButton, BizStatusTag } from '@/components';
 import {
   DEFAULT_PAGE_SIZE,
-  __ModuleName___STATUS_OPTIONS,
   __ModuleName___STATUS_TAG_OPTIONS,
 } from '../constants';
 import { query__ModuleName__List } from '../service';
@@ -35,11 +35,19 @@ const __ModuleName__Table = ({
   onEdit,
   onDelete,
 }: __ModuleName__TableProps) => {
+  const intl = useIntl();
+  const statusOptions = __ModuleName___STATUS_TAG_OPTIONS.map((item) => ({
+    ...item,
+    label: intl.formatMessage({
+      id:
+        item.value === 1
+          ? 'pages.__groupName__.__modulePath__.status.enabled'
+          : 'pages.__groupName__.__modulePath__.status.disabled',
+      defaultMessage: String(item.label),
+    }),
+  }));
   const statusValueEnum = Object.fromEntries(
-    __ModuleName___STATUS_OPTIONS.map((item) => [
-      String(item.value),
-      { text: item.label },
-    ]),
+    statusOptions.map((item) => [String(item.value), { text: item.label }]),
   );
   const normalizeStatus = (
     status: __ModuleName__TableParams['status'],
@@ -53,54 +61,129 @@ const __ModuleName__Table = ({
 
   const columns: ProColumns<__ModuleName__Item>[] = [
     {
-      title: '关键字',
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.keyword',
+        defaultMessage: 'Keyword',
+      }),
       dataIndex: 'keyword',
       hideInTable: true,
       fieldProps: {
         allowClear: true,
-        placeholder: '名称 / 编码 / 负责人',
+        placeholder: intl.formatMessage({
+          id: 'pages.__groupName__.__modulePath__.placeholder.keyword',
+          defaultMessage: 'Name / Code / Owner',
+        }),
       },
     },
-    { title: '名称', dataIndex: 'name', key: 'name', search: false },
-    { title: '编码', dataIndex: 'code', key: 'code', search: false },
     {
-      title: '状态',
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.name',
+        defaultMessage: 'Name',
+      }),
+      dataIndex: 'name',
+      key: 'name',
+      search: false,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.code',
+        defaultMessage: 'Code',
+      }),
+      dataIndex: 'code',
+      key: 'code',
+      search: false,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.status',
+        defaultMessage: 'Status',
+      }),
       dataIndex: 'status',
       key: 'status',
       valueType: 'select',
       valueEnum: statusValueEnum,
       render: (_, entity) => (
-        <BizStatusTag
-          value={entity.status}
-          options={__ModuleName___STATUS_TAG_OPTIONS}
-        />
+        <BizStatusTag value={entity.status} options={statusOptions} />
       ),
     },
-    { title: '负责人', dataIndex: 'owner', key: 'owner', search: false },
-    { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt', search: false },
     {
-      title: '操作',
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.owner',
+        defaultMessage: 'Owner',
+      }),
+      dataIndex: 'owner',
+      key: 'owner',
+      search: false,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.updatedAt',
+        defaultMessage: 'Updated At',
+      }),
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      search: false,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.field.action',
+        defaultMessage: 'Action',
+      }),
       key: 'action',
       width: 180,
       valueType: 'option',
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => onView(record)}>
-            详情
-          </Button>
-          <Button type="link" onClick={() => onEdit(record)}>
-            编辑
-          </Button>
+          <BizPermissionButton
+            hiddenWhenDenied
+            permissionCode="__groupName__:__modulePath__:view"
+            type="link"
+            onClick={() => onView(record)}
+          >
+            {intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.action.view',
+              defaultMessage: 'View',
+            })}
+          </BizPermissionButton>
+          <BizPermissionButton
+            hiddenWhenDenied
+            permissionCode="__groupName__:__modulePath__:update"
+            type="link"
+            onClick={() => onEdit(record)}
+          >
+            {intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.action.edit',
+              defaultMessage: 'Edit',
+            })}
+          </BizPermissionButton>
           <Popconfirm
-            title="确认删除该数据？"
-            description="删除后仅影响当前本地示例数据。"
-            okText="删除"
+            title={intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.delete.title',
+              defaultMessage: 'Delete this record?',
+            })}
+            description={intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.delete.description',
+              defaultMessage:
+                'This only affects the local scaffold example data.',
+            })}
+            okText={intl.formatMessage({
+              id: 'pages.__groupName__.__modulePath__.action.delete',
+              defaultMessage: 'Delete',
+            })}
             okButtonProps={{ danger: true }}
             onConfirm={() => onDelete(record)}
           >
-            <Button danger type="link">
-              删除
-            </Button>
+            <BizPermissionButton
+              danger
+              hiddenWhenDenied
+              permissionCode="__groupName__:__modulePath__:delete"
+              type="link"
+            >
+              {intl.formatMessage({
+                id: 'pages.__groupName__.__modulePath__.action.delete',
+                defaultMessage: 'Delete',
+              })}
+            </BizPermissionButton>
           </Popconfirm>
         </Space>
       ),
@@ -110,7 +193,10 @@ const __ModuleName__Table = ({
   return (
     <ProTable<__ModuleName__Item, __ModuleName__TableParams>
       actionRef={actionRef}
-      headerTitle="__moduleTitle__"
+      headerTitle={intl.formatMessage({
+        id: 'pages.__groupName__.__modulePath__.title',
+        defaultMessage: '__moduleTitleEn__',
+      })}
       rowKey="id"
       search={{ labelWidth: 100 }}
       columns={columns}

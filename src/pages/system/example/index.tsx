@@ -70,6 +70,7 @@ const ExamplePage = () => {
         toolBarRender={() => [
           <BizPermissionButton
             key="create"
+            hiddenWhenDenied
             permissionCode="system:example:create"
             type="primary"
             icon={<PlusOutlined />}

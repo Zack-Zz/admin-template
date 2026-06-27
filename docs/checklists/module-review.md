@@ -8,6 +8,7 @@
 - 模块内包含 `index.tsx`、`service.ts`、`types.ts`、`constants.ts`、`components/`。
 - 普通 CRUD 默认包含 `<Module>Table.tsx`、`<Module>FormModal.tsx`、`<Module>DetailDrawer.tsx`。
 - 路由手动添加到 `config/routes.ts`，没有让生成器自动改路由。
+- 路由 `name` 使用稳定 key，例如 `system.organization`，并补充对应 `menu.*` 文案。
 
 ## UI 与交互
 
@@ -30,8 +31,9 @@
 
 - 路由权限通过 `access` 字段和 `src/access.ts` 管理。
 - 按钮权限使用 `BizPermissionButton permissionCode` 标注。
+- 新增、详情、编辑、删除等业务操作都标注了权限点。
 - 权限点命名符合 `<domain>:<module>:<action>`。
-- 菜单、页面标题、表单项、操作提示维护了 `en-US` 和 `zh-CN` 文案。
+- 菜单、页面标题、表单项、操作提示维护了 `en-US` 和 `zh-CN` 文案，没有把中文硬编码留在模板代码里。
 
 ## 验证
 

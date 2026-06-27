@@ -74,7 +74,7 @@ src/pages/<group>/<module>/
     <Module>DetailDrawer.tsx
 ```
 
-Use `npm run gen:module -- --name <module> --group <group> --title <title>` to generate a module skeleton, then add the route manually in `config/routes.ts`.
+Use `npm run gen:module -- --name <module> --group <group> --title <中文标题> --title-en <English Title>` to generate a module skeleton, then add the route manually in `config/routes.ts`.
 
 The generator must not modify routes automatically unless the implementation is deliberately reviewed and safe. The default workflow is to print the route snippet and let the developer add it manually.
 
@@ -113,12 +113,14 @@ interface PageResult<T> {
 - The built-in `canAdmin` rule checks `currentUser.access === 'admin'`.
 - Action permission markers belong on `BizPermissionButton permissionCode`.
 - Permission codes should use `<domain>:<module>:<action>`, for example `system:example:create`.
+- `BizPermissionButton` checks `currentUser.permissions` or `currentUser.permissionCodes` when present; without a permission list it defaults to allowing scaffold actions.
 - Default locales are `en-US` and `zh-CN`; default language is `en-US`.
 - If a business project keeps only one locale, the language switcher should stay hidden.
 
 ## Code Style
 
 - Use Biome only.
+- Biome enforces `noExplicitAny` for business code; generated `src/services/openapi/` files are excluded.
 - Match existing project style and imports.
 - Keep changes surgical and scoped to the user request.
 - Prefer named local types over broad inline object types when a module reuses them.

@@ -12,7 +12,8 @@
 ## 路由与菜单
 
 - 在 `config/routes.ts` 中保留需要的菜单组，删除或隐藏不需要的示例页面。
-- 新业务模块使用 `npm run gen:module -- --name <module> --group <group> --title <title>` 生成，再手动添加路由。
+- 新业务模块使用 `npm run gen:module -- --name <module> --group <group> --title <中文标题> --title-en <English Title>` 生成，再手动添加路由。
+- 生成器会打印 route snippet、`menu.*` key 和页面 locale key；接入模块时必须补齐 `en-US` / `zh-CN` 文案。
 - 路由 `name` 应能对应 locale 中的 `menu.xxx` 文案。
 - 需要路由权限时，使用 `access` 字段并在 `src/access.ts` 中集中定义。
 
@@ -27,7 +28,7 @@
 
 - 对接真实登录接口和 `GET /api/currentUser` 或等价用户信息接口。
 - `currentUser.access` 目前用于内置 `canAdmin` 判断；真实项目可以在 `src/access.ts` 中扩展。
-- 按钮权限先使用 `BizPermissionButton permissionCode` 标注权限点。
+- 按钮权限先使用 `BizPermissionButton permissionCode` 标注权限点；后端提供 `permissions` 或 `permissionCodes` 字符串数组后会自动按码判断。
 - 权限点建议命名为 `<domain>:<module>:<action>`，例如 `system:user:create`。
 - 不在页面组件里散落角色或权限判断。
 

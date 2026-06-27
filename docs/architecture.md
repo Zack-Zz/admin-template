@@ -43,7 +43,7 @@ For scaffold examples, page `service.ts` files may return local mock promises. R
 
 ## Permissions
 
-The current baseline keeps the Ant Design Pro `access.ts` convention. Route access is centralized in `src/access.ts`; the built-in `canAdmin` rule checks `currentUser.access === 'admin'`. `BizPermissionButton` accepts `permissionCode` as a future integration point and renders by default until a real permission adapter is added.
+The current baseline keeps the Ant Design Pro `access.ts` convention. Route access is centralized in `src/access.ts`; the built-in `canAdmin` rule checks `currentUser.access === 'admin'`. `BizPermissionButton` marks action permissions and uses `currentUser.permissions` or `currentUser.permissionCodes` when a backend adapter provides them. If no permission list exists yet, it defaults to allowing actions so scaffold demos keep working.
 
 Permission codes should use `<domain>:<module>:<action>`, for example `system:example:create`.
 

@@ -34,12 +34,6 @@ export default [
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './table-list',
-  },
-  {
     path: '/system',
     name: 'system',
     icon: 'setting',

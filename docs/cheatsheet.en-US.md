@@ -33,7 +33,7 @@ npm run lint
 npx antd lint ./src --format json
 npm run build
 npm run test
-npm run gen:module -- --name organization --group system --title 组织管理
+npm run gen:module -- --name organization --group system --title 组织管理 --title-en Organization
 ```
 
 ## Golden Example

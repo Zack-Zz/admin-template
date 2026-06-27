@@ -109,7 +109,7 @@ npm run gen:module -- --name organization --group system --title 组织管理
 
 ## 权限
 
-项目保留轻量权限约定。路由权限使用 `config/routes.ts` 的 `access` 字段和 `src/access.ts`；当前内置 `canAdmin`，判断 `currentUser.access === 'admin'`。按钮权限通过 `BizPermissionButton permissionCode` 标注，建议命名为 `system:example:create` 这类 `<domain>:<module>:<action>` 格式。
+项目保留轻量权限约定。路由权限使用 `config/routes.ts` 的 `access` 字段和 `src/access.ts`；当前内置 `canAdmin`，判断 `currentUser.access === 'admin'`。按钮权限通过 `BizPermissionButton permissionCode` 标注，建议命名为 `system:example:create` 这类 `<domain>:<module>:<action>` 格式。如果后端适配层提供 `currentUser.permissions` 或 `currentUser.permissionCodes`，按钮会按权限码判断；如果暂未提供权限集合，脚手架示例默认放行。
 
 ## 验证
 

@@ -35,7 +35,7 @@
     "rules": {
       "preset": "recommended",
       "suspicious": {
-        "noExplicitAny": "off",
+        "noExplicitAny": "error",
         "noUnknownAtRules": "off"
       },
       "correctness": {
