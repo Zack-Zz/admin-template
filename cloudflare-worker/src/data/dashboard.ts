@@ -120,7 +120,7 @@ export function getProjectNotice() {
   return [
     {
       id: 'xxx1',
-      title: 'Alipay',
+      title: '用户中心',
       logo: 'https://gw.alipayobjects.com/zos/rmsportal/WdGqmHpayyMjiEhcKoVE.png',
       description: '那是一种内在的东西，他们到达不了，也无法触及的',
       updatedAt: now,
@@ -130,7 +130,7 @@ export function getProjectNotice() {
     },
     {
       id: 'xxx2',
-      title: 'Angular',
+      title: '权限管理',
       logo: 'https://gw.alipayobjects.com/zos/rmsportal/zOsKZmFRdUtvpqCImOVY.png',
       description: '希望是一个好东西，也许是最好的，好东西是不会消亡的',
       updatedAt: '2017-07-24',
@@ -140,7 +140,7 @@ export function getProjectNotice() {
     },
     {
       id: 'xxx3',
-      title: 'Ant Design',
+      title: '组织架构',
       logo: 'https://gw.alipayobjects.com/zos/rmsportal/dURIMkkrRFpPgTuzkwnB.png',
       description: '城镇中有那么多的酒馆，她却偏偏走进了我的酒馆',
       updatedAt: now,
@@ -150,7 +150,7 @@ export function getProjectNotice() {
     },
     {
       id: 'xxx4',
-      title: 'Ant Design Pro',
+      title: '系统配置',
       logo: 'https://gw.alipayobjects.com/zos/rmsportal/sfjbOqnsXXJgNCjCzDBL.png',
       description: '那时候我只会想自己想要什么，从不想自己拥有什么',
       updatedAt: '2017-07-23',
@@ -160,7 +160,7 @@ export function getProjectNotice() {
     },
     {
       id: 'xxx5',
-      title: 'Bootstrap',
+      title: '审计日志',
       logo: 'https://gw.alipayobjects.com/zos/rmsportal/siCrBXXhmvTQGWPNLBow.png',
       description: '凛冬将至',
       updatedAt: '2017-07-23',

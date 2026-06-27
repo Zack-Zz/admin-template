@@ -1,161 +1,112 @@
-Language : [English](./README.md) | 简体中文
+# admin-template
 
-<h1 align="center">Ant Design Pro</h1>
+语言：简体中文 | [English](./README.md)
 
-<div align="center">
+`admin-template` 是一个基于 Ant Design Pro、Umi Max、React 和 TypeScript 的企业级后台管理端脚手架。它用于快速创建 Java REST API / OpenAPI 后端配套的 Web 管理端，不是具体业务后台，也不是 Ant Design Pro 官方 demo 的二次展示项目。
 
-开箱即用的中台前端/设计解决方案。
+## 内置能力
 
-[![CI](https://github.com/ant-design/ant-design-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/ant-design/ant-design-pro/actions/workflows/ci.yml)
-[![GitHub release](https://img.shields.io/github/v/release/ant-design/ant-design-pro.svg)](https://github.com/ant-design/ant-design-pro/releases)
-[![Build With Utoo](https://img.shields.io/badge/build%20with-utoo-028fe4.svg)](https://utoo.land)
-[![Build With Umi](https://img.shields.io/badge/build%20with-umi-028fe4.svg)](https://umijs.org/)
-[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
-[![Ant Design](https://badgen.net/badge/icon/Ant%20Design?icon=https://gw.alipayobjects.com/zos/antfincdn/Pp4WPgVDB3/KDpgvguMpGfqaHPjicRK.svg&label)](https://ant.design/)
+- ProLayout 布局、登录页、路由和权限约定。
+- Umi Max request、错误处理和 OpenAPI 生成目录约定。
+- 标准 CRUD 示例模块：`src/pages/system/example/`。
+- 轻量业务组件：`src/components/biz/`。
+- 模块生成器：`npm run gen:module`。
+- Codex / AI coding agent 项目约束：`AGENTS.md`、`CLAUDE.md`、`docs/codex-prompt.md`。
 
-![](https://github.com/user-attachments/assets/fde29061-3d9a-4397-8ac2-397b0e033ef5)
+## 技术栈
 
-</div>
+- React 19
+- TypeScript strict
+- Umi Max 4 / Ant Design Pro
+- Ant Design 6
+- ProComponents 3
+- Tailwind CSS v4、antd-style v4
+- TanStack Query
+- Vitest
+- Biome
+- npm + `package-lock.json`
+- Node.js >= 22
 
-- 预览：https://preview.pro.ant.design
-- 使用文档：[docs/cheatsheet.zh-CN.md](./docs/cheatsheet.zh-CN.md)
-- 更新日志: https://github.com/ant-design/ant-design-pro/releases
-- 常见问题：[docs/cheatsheet.zh-CN.md#faq](./docs/cheatsheet.zh-CN.md#faq)
-- **v6 正式发布！** — [查看 v6 更新内容](https://github.com/ant-design/ant-design-pro/releases/tag/v6.0.0)
-
-## 特性
-
-- :bulb: **TypeScript**: 应用程序级 JavaScript 的语言
-- :scroll: **区块**: 通过区块模板快速构建页面
-- :gem: **优雅美观**：基于 [Ant Design 6](https://ant.design/) 体系精心设计
-- :triangular_ruler: **常见设计模式**：提炼自中后台应用的典型页面和场景
-- :rocket: **最新技术栈**：使用 React 19/[Umi Max 4](https://umijs.org/)/[antd 6](https://ant.design/)/[utoopack](https://utoo.land) 等前端前沿技术开发
-- :iphone: **响应式**：针对不同屏幕大小设计
-- :art: **主题**：基于 [Tailwind CSS v4](https://tailwindcss.com/) + [antd-style](https://github.com/ant-design/antd-style) 的可配置主题满足多样化品牌诉求
-- :globe_with_meridians: **国际化**：内建业界通用的国际化方案
-- :gear: **最佳实践**：良好的工程实践助您持续产出高质量代码
-- :1234: **Mock 数据**：实用的本地数据调试方案
-- :robot: **AI 助手**：内置 AI 聊天助手页面，基于 [Ant Design X](https://x.ant.design/)
-- :white_check_mark: **UI 测试**：自动化测试保障前端产品质量
-
-## 模板
-
-```
-- 欢迎页
-- Dashboard
-  - 分析页
-  - 监控页
-  - 工作台
-- 表单页
-  - 基础表单页
-  - 分步表单页
-  - 高级表单页
-- 列表页
-  - 搜索列表（文章/项目/应用）
-  - 查询表格
-  - 标准列表
-  - 卡片列表
-- 详情页
-  - 基础详情页
-  - 高级详情页
-- 结果
-  - 成功页
-  - 失败页
-- 异常
-  - 403 无权限
-  - 404 找不到
-  - 500 服务器出错
-- 用户
-  - 用户中心页
-  - 用户设置页
-- AI 助手
-- 账户
-  - 登录
-  - 注册
-  - 注册成功
-```
-
-## 使用
-
-### 开始使用
-
-克隆或下载本项目到本地：
-
-```bash
-git clone --depth=1 https://github.com/ant-design/ant-design-pro.git myapp
-cd myapp
-```
-
-### 安装依赖
+## 本地开发
 
 ```bash
 npm install
-```
-
-### 开发
-
-```bash
-# 启动开发服务器（默认为完整版）
 npm start
 ```
 
-### 精简为简单版本
-
-本项目默认包含所有区块。如果你需要一个最小化的版本，运行：
+常用命令：
 
 ```bash
-npm run simple
-```
-
-这将会：
-- 删除多余的页面目录（dashboard、form、list/*、profile、result、exception、account 等）
-- 删除多余的 mock 文件
-- 替换路由为简单版本
-- 从 package.json 中移除多余的依赖
-
-**注意**：此操作不可逆，将永久删除文件。
-
-### 构建
-
-```bash
+npm run dev
+npm run lint
+npm run tsc
+npm run test
 npm run build
+npm run openapi
+npm run gen:module -- --name organization --group system --title 组织管理
 ```
 
-更多信息请参考 [使用文档](./docs/cheatsheet.zh-CN.md)。
-
-## AI Skills（Claude Code）
-
-本项目内置了两个 [Claude Code Skills](https://docs.anthropic.com/en/docs/claude-code/skills)，位于 `.claude/skills/` 目录下：
-
-| Skill | 触发词 | 说明 |
-|---|---|---|
-| `/pro-upgrade` | "升级"、"upgrade pro"、"update to latest" | 自动升级到最新 Ant Design Pro 版本。对比最新模板差异，合并框架变更并保留业务代码。 |
-| `/antd` | antd 相关代码或问题 | 查询 antd 组件 API、props、token、demo；检查废弃用法；跨版本迁移 — 基于 `@ant-design/cli`。 |
-
-**在 Claude Code 中使用：**
+antd 组件开发前先查询当前版本 API：
 
 ```bash
-# 升级项目到最新 Pro 版本
-/pro-upgrade
-
-# 查询 antd 组件信息、调试问题、运行 lint 等
-/antd
+npx antd info Button --format json
+npx antd lint ./src --format json
 ```
 
-> 💡 如果你的项目是从本仓库克隆的，这些 skill 已经内置，无需额外安装。如需获取最新 skill 定义，可以从模板拉取更新或运行 `npx skills add ant-design/ant-design-pro` 刷新。
+## 目录约定
 
-## 支持环境
+```text
+config/                      Umi Max 配置、路由、OpenAPI 配置
+docs/                        架构、模块、API、Codex 约束文档
+src/app.tsx                  运行时配置、初始用户态、Layout、request
+src/access.ts                权限约定
+src/components/biz/          业务公共组件
+src/pages/system/example/    标准 CRUD 示例模块
+src/services/ant-design-pro/ OpenAPI 自动生成目录，不手工编辑
+src/types/                   通用类型与 API 契约类型
+scripts/generate-module.mjs  模块生成器
+templates/module/            模块生成模板
+```
 
-现代浏览器。
+## 开发约束
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)</br>Safari |
-| --- | --- | --- | --- |
-| Edge | last 2 versions | last 2 versions | last 2 versions |
+- 新增后台页面优先参考 `src/pages/system/example/`。
+- 页面目录保持 `index.tsx`、`service.ts`、`types.ts`、`constants.ts`、`components/` 共置。
+- UI 优先级：项目现有 Ant Design Pro / Umi Max 能力 → ProComponents → Ant Design 基础组件 → `src/components/biz/` 薄封装。
+- 禁止引入 MUI、Chakra UI、Arco Design、Element、Naive UI 等其他 UI 体系。
+- 禁止脱离 Ant Design Pro 自行设计页面风格。
+- 禁止重写 Ant Design / ProComponents 已有基础能力。
+- 禁止在业务页面中写大段自定义 CSS。
+- 禁止新增复杂低代码 CRUD 引擎。
+- API 调用走 Umi request、生成服务或页面级 `service.ts`。
+- 接口不存在时只写 TODO 或本地 mock promise，不编造真实 URL。
+- `src/services/ant-design-pro/` 是自动生成目录，必须通过 `npm run openapi` 更新。
+- 不要手动运行 `npm run simple`，本项目已经完成裁剪。
+- 不要 push 到远程仓库，除非用户明确要求。
 
-## 参与贡献
+## 新增业务模块
 
-我们非常欢迎你的贡献，你可以通过以下方式和我们一起共建 :smiley:：
+```bash
+npm run gen:module -- --name organization --group system --title 组织管理
+```
 
-- 在你的公司或个人项目中使用 Ant Design Pro。
-- 通过 [Issue](http://github.com/ant-design/ant-design-pro/issues) 报告 bug 或进行咨询。
-- 提交 [Pull Request](http://github.com/ant-design/ant-design-pro/pulls) 改进 Pro 的代码。
+生成器默认只生成文件并输出路由片段，不自动修改 `config/routes.ts`。添加路由前请先检查现有路由结构。
+
+## 国际化
+
+项目保留 Umi Max i18n。默认语言是 `en-US`，用户可以通过右上角语言菜单切换。`README.md` 是英文入口，`README.zh-CN.md` 是简体中文版本。
+
+## 验证
+
+交付前优先运行：
+
+```bash
+npm run lint
+npx antd lint ./src --format json
+npm run build
+npm run test
+```
+
+## 来源说明
+
+本项目基于 [Ant Design Pro](https://github.com/ant-design/ant-design-pro) 初始化并裁剪。后续维护应保留 Umi Max / Ant Design Pro 的核心结构，避免改造成普通 Vite 应用或完全自定义后台框架。

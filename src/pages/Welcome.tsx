@@ -40,14 +40,14 @@ const mdContent: Record<string, string> = {
   'en-US': enUS,
 };
 
-// XMarkdown Renderer passes class names via non-standard props
+type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4';
+
+// XMarkdown Renderer passes class names via non-standard props.
 interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  tag?: string;
+  tag?: HeadingTag;
   domNode?: unknown;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  classname?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  class?: any;
+  classname?: string;
+  class?: string;
 }
 
 const Heading: React.FC<HeadingProps> = ({
@@ -71,14 +71,15 @@ const Heading: React.FC<HeadingProps> = ({
     .replace(/\s+/g, '-')
     .toLowerCase();
   const mergedClass = `heading-anchor ${allClasses}`.trim();
+  const TagName = Tag;
+
   return (
-    // @ts-expect-error dynamic tag
-    <Tag id={id} className={mergedClass}>
+    <TagName id={id} className={mergedClass}>
       <a href={`#${id}`} className="anchor-link">
         #
       </a>
       {children}
-    </Tag>
+    </TagName>
   );
 };
 
@@ -158,7 +159,7 @@ const Welcome: React.FC = () => {
           {intl.formatMessage(
             {
               id: 'pages.welcome.celebrationTitle',
-              defaultMessage: '欢迎使用 Ant Design Pro {v6}',
+              defaultMessage: 'Welcome to Admin Template {v6}',
             },
             {
               v6: (

@@ -1,0 +1,47 @@
+import { BizDetailDrawer, BizStatusTag } from '@/components';
+import { __ModuleName___STATUS_TAG_OPTIONS } from '../constants';
+import type { __ModuleName__Item } from '../types';
+
+interface __ModuleName__DetailDrawerProps {
+  open: boolean;
+  record?: __ModuleName__Item;
+  onClose: () => void;
+}
+
+const __ModuleName__DetailDrawer = ({
+  open,
+  record,
+  onClose,
+}: __ModuleName__DetailDrawerProps) => {
+  return (
+    <BizDetailDrawer
+      title="__moduleTitle__详情"
+      open={open}
+      onClose={onClose}
+      items={[
+        { key: 'name', label: '名称', children: record?.name ?? '-' },
+        { key: 'code', label: '编码', children: record?.code ?? '-' },
+        {
+          key: 'status',
+          label: '状态',
+          children: (
+            <BizStatusTag
+              value={record?.status}
+              options={__ModuleName___STATUS_TAG_OPTIONS}
+            />
+          ),
+        },
+        { key: 'owner', label: '负责人', children: record?.owner ?? '-' },
+        {
+          key: 'description',
+          label: '描述',
+          children: record?.description || '-',
+        },
+        { key: 'createdAt', label: '创建时间', children: record?.createdAt ?? '-' },
+        { key: 'updatedAt', label: '更新时间', children: record?.updatedAt ?? '-' },
+      ]}
+    />
+  );
+};
+
+export default __ModuleName__DetailDrawer;

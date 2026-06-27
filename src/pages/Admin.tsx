@@ -1,4 +1,4 @@
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
+import { SmileTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { Alert, Card, Typography } from 'antd';
@@ -18,7 +18,7 @@ const Admin: React.FC = () => {
           title={intl.formatMessage({
             id: 'pages.welcome.alertMessage',
             defaultMessage:
-              'Faster and stronger heavy-duty components have been released.',
+              'Admin Template keeps framework conventions and business modules ready for extension.',
           })}
           type="success"
           showIcon
@@ -29,20 +29,12 @@ const Admin: React.FC = () => {
           }}
         />
         <Typography.Title level={2} style={{ textAlign: 'center' }}>
-          <SmileTwoTone /> Ant Design Pro{' '}
-          <HeartTwoTone twoToneColor="#eb2f96" /> You
+          <SmileTwoTone /> Admin Template
         </Typography.Title>
       </Card>
       <p style={{ textAlign: 'center', marginTop: 24 }}>
-        Want to add more pages? Please refer to{' '}
-        <a
-          href="https://pro.ant.design/docs/block-cn"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          use block
-        </a>
-        。
+        Need a new business page? Start from{' '}
+        <a href="/system/example">Example Management</a>.
       </p>
     </PageContainer>
   );

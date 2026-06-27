@@ -41,12 +41,11 @@ export default {
   'app.settings.security.modify': 'Modifikasi',
   'app.settings.security.set': 'Setel',
   'app.settings.security.bind': 'Ikat',
-  'app.settings.binding.taobao': 'Mengikat Taobao',
+  'app.settings.binding.taobao': 'Binding External Account',
   'app.settings.binding.taobao-description':
-    'Tidak mengikat akun Taobao saat ini',
-  'app.settings.binding.alipay': 'Mengikat Alipay',
-  'app.settings.binding.alipay-description':
-    'Tidak mengikat akun Alipay saat ini',
+    'Currently unbound external account',
+  'app.settings.binding.alipay': 'Binding SSO Account',
+  'app.settings.binding.alipay-description': 'Currently unbound SSO account',
   'app.settings.binding.dingding': 'Mengikat DingTalk',
   'app.settings.binding.dingding-description': 'Tidak mengikat akun DingTalk',
   'app.settings.binding.bind': 'Ikat',

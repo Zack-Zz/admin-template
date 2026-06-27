@@ -1,30 +1,58 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as api from '@/services/ant-design-pro/api';
 
+type ChildrenProps = {
+  children?: ReactNode;
+};
+
+type MockColumn = {
+  title?: string | { props?: { defaultMessage?: string } };
+  dataIndex?: string;
+};
+
+type ProTableMockProps = {
+  columns?: MockColumn[];
+  toolBarRender?: () => ReactNode;
+  request?: (...args: unknown[]) => void;
+};
+
+type DrawerMockProps = ChildrenProps & {
+  open?: boolean;
+};
+
+type ButtonMockProps = ChildrenProps & {
+  onClick?: () => void;
+};
+
+type TriggerMockProps = {
+  trigger?: ReactNode;
+};
+
 // Mock ProComponents before importing component
 vi.mock('@ant-design/pro-components', () => ({
-  PageContainer: ({ children }: any) => (
+  PageContainer: ({ children }: ChildrenProps) => (
     <div data-testid="page-container">{children}</div>
   ),
-  ProTable: ({ columns, toolBarRender, request }: any) => {
+  ProTable: ({ columns, toolBarRender, request }: ProTableMockProps) => {
     // Invoke request prop to simulate ProTable data loading
     request?.({ current: 1, pageSize: 20 }, {}, {});
     return (
       <div data-testid="pro-table">
         <div data-testid="table-columns">
-          {columns?.map((col: any) => (
+          {columns?.map((col) => (
             <div
               key={
                 typeof col.title === 'object'
-                  ? col.title.props.defaultMessage
+                  ? col.title.props?.defaultMessage
                   : col.dataIndex
               }
               data-testid={`column-${col.dataIndex}`}
             >
               {typeof col.title === 'object'
-                ? col.title.props.defaultMessage
+                ? col.title.props?.defaultMessage
                 : col.title}
             </div>
           ))}
@@ -33,17 +61,17 @@ vi.mock('@ant-design/pro-components', () => ({
       </div>
     );
   },
-  FooterToolbar: ({ children }: any) => (
+  FooterToolbar: ({ children }: ChildrenProps) => (
     <div data-testid="footer-toolbar">{children}</div>
   ),
-  ProDescriptions: ({ title }: any) => (
+  ProDescriptions: ({ title }: { title?: ReactNode }) => (
     <div data-testid="pro-descriptions">{title}</div>
   ),
 }));
 
 // Mock dependencies
 vi.mock('antd', async () => {
-  const actual = await vi.importActual('antd');
+  const actual = await vi.importActual<typeof import('antd')>('antd');
   return {
     ...actual,
     message: {
@@ -57,14 +85,16 @@ vi.mock('antd', async () => {
       success: vi.fn(),
       error: vi.fn(),
     },
-    Drawer: ({ children, open }: any) =>
+    Drawer: ({ children, open }: DrawerMockProps) =>
       open ? <div data-testid="drawer">{children}</div> : null,
-    Button: ({ children, onClick }: any) => (
+    Button: ({ children, onClick }: ButtonMockProps) => (
       <button type="button" onClick={onClick}>
         {children}
       </button>
     ),
-    Input: (props: any) => <input {...props} />,
+    Input: (props: InputHTMLAttributes<HTMLInputElement>) => (
+      <input {...props} />
+    ),
   };
 });
 
@@ -85,11 +115,15 @@ vi.mock('@/services/ant-design-pro/api', () => ({
 }));
 
 vi.mock('./components/CreateForm', () => ({
-  default: ({ trigger }: any) => <div data-testid="create-form">{trigger}</div>,
+  default: ({ trigger }: TriggerMockProps) => (
+    <div data-testid="create-form">{trigger}</div>
+  ),
 }));
 
 vi.mock('./components/UpdateForm', () => ({
-  default: ({ trigger }: any) => <div data-testid="update-form">{trigger}</div>,
+  default: ({ trigger }: TriggerMockProps) => (
+    <div data-testid="update-form">{trigger}</div>
+  ),
 }));
 
 import TableList from './index';

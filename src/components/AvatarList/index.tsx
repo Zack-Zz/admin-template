@@ -24,7 +24,10 @@ export type AvatarListProps = {
     | React.ReactElement<AvatarItemProps>[];
 };
 
-const avatarSizeToClassName = (styles: any, size?: SizeType | 'mini') =>
+const avatarSizeToClassName = (
+  styles: Record<string, string>,
+  size?: SizeType | 'mini',
+) =>
   clsx(styles.avatarItem, {
     [styles.avatarItemLarge]: size === 'large',
     [styles.avatarItemSmall]: size === 'small',

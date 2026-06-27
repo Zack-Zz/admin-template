@@ -1,130 +1,137 @@
-# CLAUDE.md
+# AGENTS.md
 
-## Project
+## Project Positioning
 
-Ant Design Pro — React enterprise boilerplate on Umi Max v4, antd v6, ProComponents v3.
+`admin-template` is an enterprise admin frontend scaffold based on Ant Design Pro, Umi Max, React, TypeScript, Ant Design, and ProComponents. It is intended as a reusable Web admin base for Java REST API / OpenAPI backends, not as a concrete business system or an Ant Design Pro demo clone.
 
-## Commands
+## Tech Stack
 
-`npm start` (dev+mock), `npm run dev` (no mock), `npm run build` (utoopack), `npm run lint` (Biome+tsc), `npm run test` (Jest), `npx antd lint ./src` (antd-specific checks).
+- React 19
+- TypeScript strict
+- Umi Max 4 / Ant Design Pro
+- Ant Design 6
+- ProComponents 3
+- Tailwind CSS v4, antd-style v4, CSS Modules when needed
+- TanStack Query for complex server state
+- npm with `package-lock.json`
+- Biome for lint/format, no ESLint or Prettier
+- Node.js >= 22
 
-Other: `npm run openapi` (regenerate `src/services/`), `npm run simple` (**irreversible** — commit first), `npm run biome` (auto-fix), `npm run tsc` (type-check only).
+## Hard Rules
 
-## Critical Rules
+- Do not introduce a new UI component library.
+- Do not introduce MUI, Chakra UI, Arco Design, Element, Naive UI, or any other competing UI system.
+- Do not convert the project to a plain Vite app.
+- Do not rewrite the Ant Design Pro / Umi Max structure.
+- Do not casually modify global Layout, theme, menu style, login flow, or request runtime.
+- Do not rewrite foundation features already provided by Ant Design or ProComponents.
+- Do not write large blocks of custom CSS in business pages.
+- Do not hand-edit `src/services/ant-design-pro/`; regenerate it with `npm run openapi`.
+- Do not invent backend URLs or fake real API contracts.
+- Do not use `any` just to silence TypeScript. Prefer `unknown`, narrow types, or explicit local interfaces.
+- Do not modify `package-lock.json` unless `package.json` changes require it.
+- Do not introduce new production dependencies unless the task truly requires them and the reason is documented.
+- Do not push to a remote repository unless the user explicitly asks.
+- Do not run `npm run simple`; it is irreversible and this project has already been simplified.
 
-- **Never edit `src/services/ant-design-pro/`** — auto-generated, regenerate with `npm run openapi`
-- **Biome only** — no ESLint, no Prettier. Both `npm run lint` and `npx antd lint ./src` must pass before commit
-- **Always `npx antd info <Component>` before writing antd code** — don't guess APIs from memory
-- **`npm run simple` is irreversible** — always commit/branch first
-- **Conventional commits** required (commitlint enforced)
-- **TypeScript strict** · **Node ≥ 22** · **`package-lock.json`** (not yarn/pnpm)
-- **`.umi` dir is auto-generated** — delete `src/.umi` and restart if dev server acts up
+## UI Component Priority
 
-## Architecture Essentials
+1. Use existing Ant Design Pro / Umi Max capabilities already present in this project.
+2. Prefer ProComponents for admin surfaces: `PageContainer`, `ProTable`, `ProForm`, `ModalForm`, `DrawerForm`, and `ProDescriptions`.
+3. Use Ant Design base components for local composition: `Table`, `Form`, `Modal`, `Drawer`, `Descriptions`, `Tag`, `Select`, `Button`, `Popconfirm`, `Space`, and `Card`.
+4. Use `src/components/biz/` only for project-level business conveniences.
+5. Keep business components as thin wrappers around Ant Design or ProComponents. They must not become a separate design system, schema renderer, or low-code CRUD engine.
 
-**Config**: `config/config.ts` (defineConfig), `config/routes.ts` (declarative routes). Route `name` → `menu.xxx` i18n key; `access` field gates visibility.
+## Page Development
 
-**Convention files** (`src/`): `app.tsx` (runtime config + `getInitialState`), `access.ts` (permissions), `global.tsx` (side effects), `loading.tsx`, `typings.d.ts`.
+- New admin pages should follow `src/pages/system/example/`.
+- Keep each module co-located:
+  - `index.tsx`
+  - `service.ts`
+  - `types.ts`
+  - `constants.ts`
+  - `components/`
+- Keep pages visually consistent with Ant Design Pro. Do not design a new visual language for a single page.
+- Prefer Ant Design, ProComponents, and `src/components/biz/` over ad hoc UI.
+- Keep forms, tables, drawers, and modals simple. Do not build a generic low-code CRUD engine.
 
-**Auth**: `getInitialState()` → `GET /api/currentUser`; 401 → redirect login. `access.ts`: `canAdmin = currentUser.access === 'admin'`. Mock creds: `admin`/`ant.design` or `user`/`ant.design`.
+## Module Directory
 
-**State**: `useModel('filename')` for global hooks (`src/models/`). `useModel('@@initialState')` for currentUser/settings. ProTable `request` prop for most data loading. `@tanstack/react-query` for complex server state.
+Recommended module path:
 
-**Styling priority**: Tailwind CSS v4 (layout) → antd-style v4 / `createStyles` (theme tokens) → CSS Modules → Less (legacy only).
-
-**Request**: built-in `request` from `@umijs/max`, configured in `src/requestErrorConfig.ts`. Per-page `service.ts` for non-generated APIs.
-
-**i18n**: 8 locales in `src/locales/`. `useIntl().formatMessage({ id, defaultMessage })`.
-
-**Mock**: `mock/` (global) + `src/pages/**/_mock.ts` (co-located). Express-style handlers.
-
-**Cloudflare Worker**: `cloudflare-worker/` — separate Hono app, own `package.json`, not an npm workspace.
-
-## AI Skills
-
-This project ships with two built-in Claude Code Skills (`.claude/skills/`). If you already have these skills in your project, no installation is needed — just run them directly. To update to the latest skill definitions, run `npx skills add ant-design/ant-design-pro`.
-
-### `/pro-upgrade` — Project Upgrade
-
-Run `/pro-upgrade` in Claude Code to auto-upgrade the project to the latest Ant Design Pro version. It diffs the latest template against this project and merges framework changes while preserving business code. Works for any version gap (v5→v6, v6.x→latest, etc.).
-
-### `/antd` — Ant Design CLI
-
-Run `/antd` in Claude Code for any antd-related work. It provides access to `@ant-design/cli` with offline metadata for antd v3/v4/v5/v6. Key commands:
-
-- `npx antd info <Component>` — look up props/API before writing code (mandatory)
-- `npx antd lint ./src` — check for deprecated or problematic usage (must pass before commit)
-- `npx antd demo <Component> <demo>` — get working code examples
-- `npx antd migrate <from> <to>` — migration checklist between major versions
-
-## Page Co-location
-
-Each page dir: `index.tsx`, optional `service.ts`, `_mock.ts`, `data.d.ts`, style files. Keep page-specific code with the page.
-
-# CLAUDE.md
-
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-## 1. Think Before Coding
-
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-Before implementing:
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
-
-## 2. Simplicity First
-
-**Minimum code that solves the problem. Nothing speculative.**
-
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
-
-## 3. Surgical Changes
-
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: Every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+```text
+src/pages/<group>/<module>/
+  index.tsx
+  service.ts
+  types.ts
+  constants.ts
+  components/
+    <Module>SearchForm.tsx
+    <Module>Table.tsx
+    <Module>FormModal.tsx
+    <Module>DetailDrawer.tsx
 ```
 
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+Use `npm run gen:module -- --name <module> --group <group> --title <title>` to generate a module skeleton, then add the route manually in `config/routes.ts`.
 
----
+The generator must not modify routes automatically unless the implementation is deliberately reviewed and safe. The default workflow is to print the route snippet and let the developer add it manually.
 
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+## API Rules
 
----
+- Use Umi Max `request` through generated services or per-page `service.ts`.
+- Keep backend response types aligned with `src/types/api.ts`.
+- Default response envelope:
+
+```ts
+interface ApiResult<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+```
+
+- Default pagination envelope:
+
+```ts
+interface PageResult<T> {
+  records: T[];
+  total: number;
+  pageNo: number;
+  pageSize: number;
+}
+```
+
+- If a backend API does not exist, leave a TODO and use a local mock promise only for scaffold examples.
+- Future Authorization and tenant headers belong in request interceptors, not in page components.
+
+## Code Style
+
+- Use Biome only.
+- Match existing project style and imports.
+- Keep changes surgical and scoped to the user request.
+- Prefer named local types over broad inline object types when a module reuses them.
+- Remove unused code introduced by your own changes.
+
+## Verification
+
+Before handing off, run the commands that actually exist in this project:
+
+```bash
+npm run lint
+npx antd lint ./src --format json
+npm run build
+npm run test
+```
+
+If a command fails, fix project-introduced failures first. If the failure is from existing template state or environment, report the exact command and error summary.
+
+## Delivery Notes
+
+Every final report should include:
+
+- Files changed and files added.
+- Scaffold conventions introduced.
+- TODO items left intentionally.
+- How to add a new module.
+- Verification commands run and their results.
+- Risks or unfinished items.

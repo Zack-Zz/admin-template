@@ -42,12 +42,11 @@ export default {
   'app.settings.security.modify': 'Modificar',
   'app.settings.security.set': 'Atribuir',
   'app.settings.security.bind': 'Vincular',
-  'app.settings.binding.taobao': 'Vincular Taobao',
+  'app.settings.binding.taobao': 'Binding External Account',
   'app.settings.binding.taobao-description':
-    'Atualmente não vinculado à conta Taobao',
-  'app.settings.binding.alipay': 'Vincular Alipay',
-  'app.settings.binding.alipay-description':
-    'Atualmente não vinculado à conta Alipay',
+    'Currently unbound external account',
+  'app.settings.binding.alipay': 'Binding SSO Account',
+  'app.settings.binding.alipay-description': 'Currently unbound SSO account',
   'app.settings.binding.dingding': 'Vincular DingTalk',
   'app.settings.binding.dingding-description':
     'Atualmente não vinculado à conta DingTalk',

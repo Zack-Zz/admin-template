@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock all heavy dependencies before importing app
@@ -13,9 +14,13 @@ const mockHistory = {
 
 const mockQueryCurrentUser = vi.fn();
 
+type ChildrenProps = {
+  children?: ReactNode;
+};
+
 vi.mock('@umijs/max', () => ({
   history: mockHistory,
-  Link: ({ children }: any) => children,
+  Link: ({ children }: ChildrenProps) => children,
 }));
 
 vi.mock('@/services/ant-design-pro/api', () => ({
@@ -25,7 +30,7 @@ vi.mock('@/services/ant-design-pro/api', () => ({
 vi.mock('@/components', () => ({
   AvatarDropdown: () => null,
   DocLink: () => null,
-  ErrorBoundary: ({ children }: any) => children,
+  ErrorBoundary: ({ children }: ChildrenProps) => children,
   Footer: () => null,
   LangDropdown: () => null,
   OfflineBanner: () => null,

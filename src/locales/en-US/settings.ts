@@ -39,10 +39,11 @@ export default {
   'app.settings.security.modify': 'Modify',
   'app.settings.security.set': 'Set',
   'app.settings.security.bind': 'Bind',
-  'app.settings.binding.taobao': 'Binding Taobao',
-  'app.settings.binding.taobao-description': 'Currently unbound Taobao account',
-  'app.settings.binding.alipay': 'Binding Alipay',
-  'app.settings.binding.alipay-description': 'Currently unbound Alipay account',
+  'app.settings.binding.taobao': 'Binding External Account',
+  'app.settings.binding.taobao-description':
+    'Currently unbound external account',
+  'app.settings.binding.alipay': 'Binding SSO Account',
+  'app.settings.binding.alipay-description': 'Currently unbound SSO account',
   'app.settings.binding.dingding': 'Binding DingTalk',
   'app.settings.binding.dingding-description':
     'Currently unbound DingTalk account',

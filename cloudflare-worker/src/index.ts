@@ -18,8 +18,7 @@ const app = new Hono();
 app.use(
   '/*',
   cors({
-    origin: (origin) =>
-      corsOrigin(origin) ? origin : 'https://preview.pro.ant.design',
+    origin: (origin) => (corsOrigin(origin) ? origin : 'http://localhost:8000'),
     allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
   }),

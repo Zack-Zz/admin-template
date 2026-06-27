@@ -1,12 +1,12 @@
 export const titles = [
-  'Alipay',
-  'Angular',
-  'Ant Design',
-  'Ant Design Pro',
-  'Bootstrap',
-  'React',
-  'Vue',
-  'Webpack',
+  '用户中心',
+  '权限管理',
+  '组织架构',
+  '数据看板',
+  '系统配置',
+  '流程审批',
+  '消息通知',
+  '审计日志',
 ];
 
 export const avatars = [
@@ -70,14 +70,14 @@ export const members = [
 ];
 
 export const defaultUser = {
-  name: 'Serati Ma',
+  name: 'Admin User',
   avatar:
     'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
   userid: '00000001',
-  email: 'antdesign@alipay.com',
-  signature: '海纳百川，有容乃大',
-  title: '交互专家',
-  group: '蚂蚁集团－某某某事业群－某某平台部－某某技术部－UED',
+  email: 'admin@example.com',
+  signature: '保持清晰、稳定、可维护',
+  title: '系统管理员',
+  group: '示例组织－平台团队－前端工程',
   tags: [
     { key: '0', label: '很有想法的' },
     { key: '1', label: '专注设计' },
@@ -116,7 +116,7 @@ export function fakeList(count: number) {
       status: statuses[i % statuses.length],
       percent: Math.ceil(Math.random() * 50) + 50,
       logo: avatars[i % avatars.length],
-      href: 'https://ant.design',
+      href: '#',
       updatedAt: Date.now() - Math.floor(Math.random() * 1000000000),
       createdAt: Date.now() - Math.floor(Math.random() * 1000000000),
       subDescription: desc[i % desc.length],
@@ -128,7 +128,7 @@ export function fakeList(count: number) {
       like: Math.floor(Math.random() * 100) + 10,
       message: Math.floor(Math.random() * 100) + 10,
       content:
-        '段落示意：蚂蚁集团设计平台 ant.design，用最小的工作量，无缝接入蚂蚁集团生态，提供跨越设计与开发的体验解决方案。蚂蚁集团设计平台 ant.design，用最小的工作量，无缝接入蚂蚁集团生态，提供跨越设计与开发的体验解决方案。',
+        '段落示意：这里是脚手架内置的本地 mock 数据，用于展示列表、详情和卡片页面的基础效果。接入真实后端时，应替换为 Umi request 或 OpenAPI 生成服务。',
       members,
     });
   }

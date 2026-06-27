@@ -43,6 +43,7 @@ export default defineConfig({
    * @doc https://umijs.org/docs/api/config#hash
    */
   hash: true,
+  esbuildMinifyIIFE: true,
 
   publicPath: PUBLIC_PATH,
 
@@ -114,7 +115,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Ant Design Pro',
+  title: 'Admin Template',
   layout: {
     locale: true,
     ...defaultSettings,
@@ -133,11 +134,11 @@ export default defineConfig({
    * @doc https://umijs.org/docs/max/i18n
    */
   locale: {
-    // default zh-CN
-    default: 'zh-CN',
+    // Default to English for a reusable scaffold.
+    default: 'en-US',
     antd: true,
-    // default true, when it is true, will use `navigator.language` overwrite default
-    baseNavigator: true,
+    // Keep the first visit deterministic; users can switch language from the header.
+    baseNavigator: false,
   },
   /**
    * @name antd 插件
@@ -214,15 +215,13 @@ export default defineConfig({
     include: ['src/pages/**/_mock.ts'],
     exclude: ['mock/requestRecord.mock.js'],
   },
-  utoopack: {
-    module: {
-      rules: {
-        '*.md': {
-          loaders: [{ loader: join(__dirname, 'md-raw-loader.cjs') }],
-          as: '*.js',
-        },
-      },
-    },
+  chainWebpack(memo) {
+    memo.module
+      .rule('md-raw')
+      .test(/\.md$/)
+      .type('javascript/auto')
+      .use('md-raw-loader')
+      .loader(join(__dirname, 'md-raw-loader.cjs'));
   },
   requestRecord: {},
   exportStatic: {},
@@ -231,6 +230,5 @@ export default defineConfig({
     'process.env.COMMIT_HASH': commitHash,
     __APP_VERSION__: require('./../package.json').version,
     __UMI_VERSION__: require('@umijs/max/package.json').version,
-    __UTOO_VERSION__: require('@utoo/pack/package.json').version,
   },
 });

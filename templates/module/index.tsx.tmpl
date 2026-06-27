@@ -1,0 +1,150 @@
+import { PlusOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
+import { message } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import { BizPermissionButton, BizToolbar } from '@/components';
+import type { PageResult } from '@/types';
+import { DEFAULT_PAGE_SIZE } from './constants';
+import __ModuleName__DetailDrawer from './components/__ModuleName__DetailDrawer';
+import __ModuleName__FormModal from './components/__ModuleName__FormModal';
+import __ModuleName__SearchForm from './components/__ModuleName__SearchForm';
+import __ModuleName__Table from './components/__ModuleName__Table';
+import {
+  create__ModuleName__,
+  delete__ModuleName__,
+  query__ModuleName__List,
+  update__ModuleName__,
+} from './service';
+import type {
+  __ModuleName__FormValues,
+  __ModuleName__Item,
+  __ModuleName__Query,
+} from './types';
+
+const defaultQuery: __ModuleName__Query = {
+  pageNo: 1,
+  pageSize: DEFAULT_PAGE_SIZE,
+};
+
+const __ModuleName__Page = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [query, setQuery] = useState<__ModuleName__Query>(defaultQuery);
+  const [data, setData] = useState<PageResult<__ModuleName__Item>>();
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState<__ModuleName__Item>();
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  const loadData = useCallback(async (nextQuery: __ModuleName__Query) => {
+    setLoading(true);
+    try {
+      const result = await query__ModuleName__List(nextQuery);
+      setData(result);
+      setQuery(nextQuery);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadData(defaultQuery);
+  }, [loadData]);
+
+  const closeForm = () => {
+    setFormOpen(false);
+    setCurrentRecord(undefined);
+  };
+
+  const handleSubmit = async (values: __ModuleName__FormValues) => {
+    setSaving(true);
+    try {
+      if (currentRecord) {
+        await update__ModuleName__(currentRecord.id, values);
+        messageApi.success('__moduleTitle__已更新');
+      } else {
+        await create__ModuleName__(values);
+        messageApi.success('__moduleTitle__已新增');
+      }
+      closeForm();
+      await loadData({ ...query, pageNo: 1 });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (record: __ModuleName__Item) => {
+    await delete__ModuleName__(record.id);
+    messageApi.success('__moduleTitle__已删除');
+    await loadData(query);
+  };
+
+  return (
+    <PageContainer>
+      {contextHolder}
+      <div className="rounded bg-white p-6">
+        <BizToolbar
+          title="__moduleTitle__"
+          extra={
+            <BizPermissionButton
+              permissionCode="__groupName__:__modulePath__:create"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setCurrentRecord(undefined);
+                setFormOpen(true);
+              }}
+            >
+              新增
+            </BizPermissionButton>
+          }
+        />
+        <div className="mb-4">
+          <__ModuleName__SearchForm
+            loading={loading}
+            onSearch={(values) => {
+              void loadData({ ...query, ...values, pageNo: 1 });
+            }}
+            onReset={() => {
+              void loadData(defaultQuery);
+            }}
+          />
+        </div>
+        <__ModuleName__Table
+          data={data}
+          loading={loading}
+          onPageChange={(pageNo, pageSize) => {
+            void loadData({ ...query, pageNo, pageSize });
+          }}
+          onView={(record) => {
+            setCurrentRecord(record);
+            setDetailOpen(true);
+          }}
+          onEdit={(record) => {
+            setCurrentRecord(record);
+            setFormOpen(true);
+          }}
+          onDelete={handleDelete}
+        />
+      </div>
+      <__ModuleName__FormModal
+        open={formOpen}
+        mode={currentRecord ? 'edit' : 'create'}
+        values={currentRecord}
+        confirmLoading={saving}
+        onCancel={closeForm}
+        onSubmit={handleSubmit}
+      />
+      <__ModuleName__DetailDrawer
+        open={detailOpen}
+        record={currentRecord}
+        onClose={() => {
+          setDetailOpen(false);
+          setCurrentRecord(undefined);
+        }}
+      />
+    </PageContainer>
+  );
+};
+
+export default __ModuleName__Page;

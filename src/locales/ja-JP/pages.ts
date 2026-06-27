@@ -1,14 +1,14 @@
 export default {
   'pages.layouts.userLayout.title':
-    'Ant Designは、西湖区で最も影響力のあるWebデザイン仕様です。',
+    'Enterprise admin scaffold for Java REST API / OpenAPI backends',
   'pages.login.accountLogin.tab': 'アカウントログイン',
   'pages.login.accountLogin.errorMessage':
-    'ユーザー名/パスワードが正しくありません(admin/ant.design)',
+    'Incorrect username or password (admin/admin.template)',
   'pages.login.failure': 'ログインに失敗したら、もう一度試してください!',
   'pages.login.success': 'ログイン成功!',
   'pages.login.username.placeholder': 'ユーザー名：adminまたはuser',
   'pages.login.username.required': 'ユーザー名を入力してください！',
-  'pages.login.password.placeholder': 'パスワード：ant.design',
+  'pages.login.password.placeholder': 'Password: admin.template',
   'pages.login.password.required': 'パスワードを入力してください！',
   'pages.login.phoneLogin.tab': '電話ログイン',
   'pages.login.phoneLogin.errorMessage': '検証コードエラー',
@@ -25,9 +25,8 @@ export default {
   'pages.login.loginWith': 'その他のログイン方法：',
   'pages.login.registerAccount': 'アカウント登録',
   'pages.welcome.link': 'ようこそ',
-  'pages.welcome.celebrationTitle': 'Ant Design Pro {v6} へようこそ',
-  'pages.welcome.alertMessage':
-    'より高速で強力な頑丈なコンポーネントがリリースされました。',
+  'pages.welcome.celebrationTitle': 'Welcome to Admin Template {v6}',
+  'pages.welcome.alertMessage': 'A maintainable admin scaffold is ready.',
   'pages.404.subTitle':
     '申し訳ありませんが、アクセスしたページは存在しません。',
   'pages.404.buttonText': 'ホームに戻る',

@@ -1,0 +1,26 @@
+import type { PageQuery } from '@/types';
+
+export type __ModuleName__Status = 0 | 1;
+
+export interface __ModuleName__Item {
+  id: string;
+  name: string;
+  code: string;
+  status: __ModuleName__Status;
+  owner: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface __ModuleName__Query extends PageQuery {
+  status?: __ModuleName__Status;
+}
+
+export interface __ModuleName__FormValues {
+  name: string;
+  code: string;
+  status: __ModuleName__Status;
+  owner: string;
+  description?: string;
+}

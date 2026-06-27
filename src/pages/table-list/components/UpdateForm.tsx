@@ -13,7 +13,7 @@ import React, { cloneElement, useCallback, useState } from 'react';
 import { updateRule } from '@/services/ant-design-pro/api';
 
 type UpdateFormProps = {
-  trigger?: React.ReactElement<any>;
+  trigger?: React.ReactElement<{ onClick?: () => void }>;
   onOk?: () => void;
   values: Partial<API.RuleListItem>;
 };
@@ -49,7 +49,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   }, []);
 
   const onFinish = useCallback(
-    async (values?: any) => {
+    async (values?: Partial<API.RuleListItem>) => {
       await run({ data: values });
       onCancel();
     },

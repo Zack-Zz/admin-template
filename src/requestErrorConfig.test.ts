@@ -2,6 +2,30 @@ import { message, notification } from 'antd';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { errorConfig } from './requestErrorConfig';
 
+type TestResponseError = Error & {
+  info?: {
+    errorCode?: number;
+    errorMessage?: string;
+    showType?: number;
+    data?: unknown;
+  };
+  response?: {
+    status: number;
+    data?: unknown;
+  };
+  request?: unknown;
+};
+
+const createBizError = (
+  messageText: string,
+  info: TestResponseError['info'],
+): TestResponseError => {
+  const error = new Error(messageText) as TestResponseError;
+  error.name = 'BizError';
+  error.info = info;
+  return error;
+};
+
 vi.mock('antd', () => ({
   message: {
     warning: vi.fn(),
@@ -66,12 +90,13 @@ describe('requestErrorConfig', () => {
       expect.assertions(5);
       try {
         errorThrower(response);
-      } catch (error: any) {
-        expect(error.name).toBe('BizError');
-        expect(error.info.errorCode).toBe(403);
-        expect(error.info.errorMessage).toBe('Forbidden');
-        expect(error.info.showType).toBe(3);
-        expect(error.info.data).toEqual({ detail: 'more info' });
+      } catch (error) {
+        const bizError = error as TestResponseError;
+        expect(bizError.name).toBe('BizError');
+        expect(bizError.info?.errorCode).toBe(403);
+        expect(bizError.info?.errorMessage).toBe('Forbidden');
+        expect(bizError.info?.showType).toBe(3);
+        expect(bizError.info?.data).toEqual({ detail: 'more info' });
       }
     });
   });
@@ -87,13 +112,11 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle SILENT showType', () => {
-      const error: any = new Error('Silent error');
-      error.name = 'BizError';
-      error.info = {
+      const error = createBizError('Silent error', {
         errorCode: 1001,
         errorMessage: 'Silent error',
         showType: 0,
-      };
+      });
 
       errorHandler(error, {});
 
@@ -103,13 +126,11 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle WARN_MESSAGE showType', () => {
-      const error: any = new Error('Warning');
-      error.name = 'BizError';
-      error.info = {
+      const error = createBizError('Warning', {
         errorCode: 1002,
         errorMessage: 'This is a warning',
         showType: 1,
-      };
+      });
 
       errorHandler(error, {});
 
@@ -117,13 +138,11 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle ERROR_MESSAGE showType', () => {
-      const error: any = new Error('Error message');
-      error.name = 'BizError';
-      error.info = {
+      const error = createBizError('Error message', {
         errorCode: 1003,
         errorMessage: 'This is an error',
         showType: 2,
-      };
+      });
 
       errorHandler(error, {});
 
@@ -131,13 +150,11 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle NOTIFICATION showType', () => {
-      const error: any = new Error('Notification');
-      error.name = 'BizError';
-      error.info = {
+      const error = createBizError('Notification', {
         errorCode: 1004,
         errorMessage: 'This is a notification',
         showType: 3,
-      };
+      });
 
       errorHandler(error, {});
 
@@ -148,13 +165,11 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle REDIRECT showType', () => {
-      const error: any = new Error('Redirect');
-      error.name = 'BizError';
-      error.info = {
+      const error = createBizError('Redirect', {
         errorCode: 401,
         errorMessage: 'Unauthorized',
         showType: 9,
-      };
+      });
 
       errorHandler(error, {});
 
@@ -165,13 +180,11 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle default case for unknown showType', () => {
-      const error: any = new Error('Unknown type');
-      error.name = 'BizError';
-      error.info = {
+      const error = createBizError('Unknown type', {
         errorCode: 1005,
         errorMessage: 'Unknown error type',
         showType: 99,
-      };
+      });
 
       errorHandler(error, {});
 
@@ -179,7 +192,7 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle axios response error', () => {
-      const error: any = new Error('Axios error');
+      const error = new Error('Axios error') as TestResponseError;
       error.response = {
         status: 500,
         data: {},
@@ -191,7 +204,7 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle offline error', () => {
-      const error: any = new Error('Network error');
+      const error = new Error('Network error') as TestResponseError;
       error.request = {};
 
       const originalOnLine = navigator.onLine;
@@ -215,7 +228,7 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle request error with no response', () => {
-      const error: any = new Error('Request error');
+      const error = new Error('Request error') as TestResponseError;
       error.request = {};
 
       errorHandler(error, {});
@@ -226,7 +239,7 @@ describe('requestErrorConfig', () => {
     });
 
     it('should handle generic error', () => {
-      const error: any = new Error('Generic error');
+      const error = new Error('Generic error');
 
       errorHandler(error, {});
 
@@ -246,7 +259,7 @@ describe('requestErrorConfig', () => {
 
     it('should pass through config without modification', () => {
       const config = {
-        url: 'https://api.example.com/users',
+        url: '/request-test/users',
         method: 'GET',
       };
 
@@ -254,7 +267,7 @@ describe('requestErrorConfig', () => {
 
       // Token attachment is intentionally commented out in the source;
       // interceptor currently returns config as-is
-      expect(result.url).toBe('https://api.example.com/users');
+      expect(result.url).toBe('/request-test/users');
     });
 
     it('should handle URL without config', () => {

@@ -20,6 +20,38 @@ interface ResponseStructure {
   showType?: ErrorShowType;
 }
 
+type ResponseErrorInfo = Omit<ResponseStructure, 'success'>;
+
+type BizError = Error & {
+  name: 'BizError';
+  info: ResponseErrorInfo;
+};
+
+type ResponseError = Error & {
+  response: {
+    status?: number;
+  };
+};
+
+type RequestError = Error & {
+  request: unknown;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const isBizError = (error: unknown): error is BizError =>
+  error instanceof Error &&
+  error.name === 'BizError' &&
+  isRecord(error) &&
+  isRecord(error.info);
+
+const hasResponse = (error: unknown): error is ResponseError =>
+  error instanceof Error && isRecord(error) && isRecord(error.response);
+
+const hasRequest = (error: unknown): error is RequestError =>
+  error instanceof Error && isRecord(error) && 'request' in error;
+
 /**
  * @name 错误处理
  * pro 自带的错误处理， 可以在这里做自己的改动
@@ -33,44 +65,41 @@ export const errorConfig: RequestConfig = {
       const { success, data, errorCode, errorMessage, showType } =
         res as unknown as ResponseStructure;
       if (!success) {
-        const error: any = new Error(errorMessage);
+        const error = new Error(errorMessage) as BizError;
         error.name = 'BizError';
         error.info = { errorCode, errorMessage, showType, data };
         throw error; // 抛出自制的错误
       }
     },
     // 错误接收及处理
-    errorHandler: (error: any, opts: any) => {
+    errorHandler: (error: unknown, opts?: RequestOptions) => {
       if (opts?.skipErrorHandler) throw error;
       // 我们的 errorThrower 抛出的错误。
-      if (error.name === 'BizError') {
-        const errorInfo: ResponseStructure | undefined = error.info;
-        if (errorInfo) {
-          const { errorMessage, errorCode } = errorInfo;
-          switch (errorInfo.showType) {
-            case ErrorShowType.SILENT:
-              // do nothing
-              break;
-            case ErrorShowType.WARN_MESSAGE:
-              message.warning(errorMessage);
-              break;
-            case ErrorShowType.ERROR_MESSAGE:
-              message.error(errorMessage);
-              break;
-            case ErrorShowType.NOTIFICATION:
-              notification.open({
-                title: errorCode,
-                description: errorMessage,
-              });
-              break;
-            case ErrorShowType.REDIRECT:
-              window.location.href = '/user/login';
-              break;
-            default:
-              message.error(errorMessage);
-          }
+      if (isBizError(error)) {
+        const { errorMessage, errorCode } = error.info;
+        switch (error.info.showType) {
+          case ErrorShowType.SILENT:
+            // do nothing
+            break;
+          case ErrorShowType.WARN_MESSAGE:
+            message.warning(errorMessage);
+            break;
+          case ErrorShowType.ERROR_MESSAGE:
+            message.error(errorMessage);
+            break;
+          case ErrorShowType.NOTIFICATION:
+            notification.open({
+              title: errorCode,
+              description: errorMessage,
+            });
+            break;
+          case ErrorShowType.REDIRECT:
+            window.location.href = '/user/login';
+            break;
+          default:
+            message.error(errorMessage);
         }
-      } else if (error.response) {
+      } else if (hasResponse(error)) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
         message.error(`Response status:${error.response.status}`);
@@ -82,7 +111,7 @@ export const errorConfig: RequestConfig = {
               'Network unavailable. Please check your connection and try again.',
           }),
         );
-      } else if (error.request) {
+      } else if (hasRequest(error)) {
         message.error('None response! Please retry.');
       } else {
         message.error('Request error, please retry.');

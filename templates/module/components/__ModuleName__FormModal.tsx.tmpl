@@ -1,0 +1,67 @@
+import { Form, Input } from 'antd';
+import { BizDictSelect, BizFormModal } from '@/components';
+import { __ModuleName___STATUS_OPTIONS } from '../constants';
+import type { __ModuleName__FormValues, __ModuleName__Item } from '../types';
+
+interface __ModuleName__FormModalProps {
+  open: boolean;
+  mode: 'create' | 'edit';
+  values?: __ModuleName__Item;
+  confirmLoading?: boolean;
+  onCancel: () => void;
+  onSubmit: (values: __ModuleName__FormValues) => void | Promise<void>;
+}
+
+const __ModuleName__FormModal = ({
+  open,
+  mode,
+  values,
+  confirmLoading,
+  onCancel,
+  onSubmit,
+}: __ModuleName__FormModalProps) => {
+  return (
+    <BizFormModal<__ModuleName__FormValues>
+      title={mode === 'create' ? '新增__moduleTitle__' : '编辑__moduleTitle__'}
+      open={open}
+      confirmLoading={confirmLoading}
+      initialValues={values ?? { status: 1 }}
+      onCancel={onCancel}
+      onSubmit={onSubmit}
+    >
+      <Form.Item
+        name="name"
+        label="名称"
+        rules={[{ required: true, message: '请输入名称' }]}
+      >
+        <Input maxLength={40} placeholder="请输入名称" />
+      </Form.Item>
+      <Form.Item
+        name="code"
+        label="编码"
+        rules={[{ required: true, message: '请输入编码' }]}
+      >
+        <Input maxLength={40} placeholder="请输入编码" />
+      </Form.Item>
+      <Form.Item
+        name="status"
+        label="状态"
+        rules={[{ required: true, message: '请选择状态' }]}
+      >
+        <BizDictSelect options={__ModuleName___STATUS_OPTIONS} placeholder="请选择状态" />
+      </Form.Item>
+      <Form.Item
+        name="owner"
+        label="负责人"
+        rules={[{ required: true, message: '请输入负责人' }]}
+      >
+        <Input maxLength={40} placeholder="请输入负责人" />
+      </Form.Item>
+      <Form.Item name="description" label="描述">
+        <Input.TextArea maxLength={200} placeholder="请输入描述" showCount />
+      </Form.Item>
+    </BizFormModal>
+  );
+};
+
+export default __ModuleName__FormModal;

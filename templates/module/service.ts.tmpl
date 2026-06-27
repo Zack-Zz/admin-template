@@ -1,0 +1,108 @@
+import type { PageResult } from '@/types';
+import { DEFAULT_PAGE_SIZE } from './constants';
+import type {
+  __ModuleName__FormValues,
+  __ModuleName__Item,
+  __ModuleName__Query,
+} from './types';
+
+const now = '2026-06-27 10:00:00';
+
+let __moduleName__List: __ModuleName__Item[] = [
+  {
+    id: '1',
+    name: '__moduleTitle__样例',
+    code: '__modulePath__-demo',
+    status: 1,
+    owner: 'Admin',
+    description: 'TODO: 后端接口确定后替换本地示例数据。',
+    createdAt: now,
+    updatedAt: now,
+  },
+];
+
+const wait = async () =>
+  new Promise((resolve) => {
+    globalThis.setTimeout(resolve, 240);
+  });
+
+const getCurrentTime = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+export async function query__ModuleName__List(
+  query: __ModuleName__Query = {},
+): Promise<PageResult<__ModuleName__Item>> {
+  await wait();
+
+  // TODO: replace this local promise with a Umi request or generated OpenAPI service.
+  const pageNo = query.pageNo ?? 1;
+  const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
+  const keyword = query.keyword?.trim().toLowerCase();
+
+  const filtered = __moduleName__List.filter((item) => {
+    const matchKeyword = keyword
+      ? [item.name, item.code, item.owner].some((value) =>
+          value.toLowerCase().includes(keyword),
+        )
+      : true;
+    const matchStatus =
+      typeof query.status === 'number' ? item.status === query.status : true;
+
+    return matchKeyword && matchStatus;
+  });
+
+  const start = (pageNo - 1) * pageSize;
+
+  return {
+    records: filtered.slice(start, start + pageSize),
+    total: filtered.length,
+    pageNo,
+    pageSize,
+  };
+}
+
+export async function create__ModuleName__(
+  values: __ModuleName__FormValues,
+): Promise<__ModuleName__Item> {
+  await wait();
+
+  const currentTime = getCurrentTime();
+  const item: __ModuleName__Item = {
+    ...values,
+    id: `${Date.now()}`,
+    createdAt: currentTime,
+    updatedAt: currentTime,
+  };
+
+  __moduleName__List = [item, ...__moduleName__List];
+
+  return item;
+}
+
+export async function update__ModuleName__(
+  id: string,
+  values: __ModuleName__FormValues,
+): Promise<__ModuleName__Item> {
+  await wait();
+
+  const current = __moduleName__List.find((item) => item.id === id);
+  if (!current) {
+    throw new Error('__moduleTitle__数据不存在');
+  }
+
+  const next: __ModuleName__Item = {
+    ...current,
+    ...values,
+    updatedAt: getCurrentTime(),
+  };
+
+  __moduleName__List = __moduleName__List.map((item) =>
+    item.id === id ? next : item,
+  );
+
+  return next;
+}
+
+export async function delete__ModuleName__(id: string): Promise<void> {
+  await wait();
+  __moduleName__List = __moduleName__List.filter((item) => item.id !== id);
+}

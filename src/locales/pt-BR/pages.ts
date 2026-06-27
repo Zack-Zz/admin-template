@@ -1,14 +1,14 @@
 export default {
   'pages.layouts.userLayout.title':
-    'Ant Design é a especificação de web design mais influente no distrito de Xihu',
+    'Enterprise admin scaffold for Java REST API / OpenAPI backends',
   'pages.login.accountLogin.tab': 'Login da conta',
   'pages.login.accountLogin.errorMessage':
-    'usuário/senha incorreto(admin/ant.design)',
+    'Incorrect username or password (admin/admin.template)',
   'pages.login.failure': 'Login falhou, por favor tente novamente!',
   'pages.login.success': 'Login efetuado com sucesso!',
   'pages.login.username.placeholder': 'Usuário: admin or user',
   'pages.login.username.required': 'Por favor insira seu usuário!',
-  'pages.login.password.placeholder': 'Senha: ant.design',
+  'pages.login.password.placeholder': 'Password: admin.template',
   'pages.login.password.required': 'Por favor insira sua senha!',
   'pages.login.phoneLogin.tab': 'Login com Telefone',
   'pages.login.phoneLogin.errorMessage': 'Erro de Código de Verificação',
@@ -26,9 +26,8 @@ export default {
   'pages.login.loginWith': 'Login com :',
   'pages.login.registerAccount': 'Registra Conta',
   'pages.welcome.link': 'Bem-vindo',
-  'pages.welcome.celebrationTitle': 'Bem-vindo ao Ant Design Pro {v6}',
-  'pages.welcome.alertMessage':
-    'Componentes pesados mais rápidos e mais fortes foram lançados.',
+  'pages.welcome.celebrationTitle': 'Welcome to Admin Template {v6}',
+  'pages.welcome.alertMessage': 'A maintainable admin scaffold is ready.',
   'pages.404.subTitle': 'Desculpe, a página que você visitou não existe. ',
   'pages.404.buttonText': 'Voltar à página inicial',
   'pages.admin.subPage.title': 'Esta página só pode ser vista pelo Admin',

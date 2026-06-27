@@ -39,12 +39,11 @@ export default {
   'app.settings.security.modify': '変更する',
   'app.settings.security.set': 'セットする',
   'app.settings.security.bind': 'バインド',
-  'app.settings.binding.taobao': 'タオバオをバインドする',
+  'app.settings.binding.taobao': 'Binding External Account',
   'app.settings.binding.taobao-description':
-    '現在バインドされていないタオバオアカウント',
-  'app.settings.binding.alipay': 'アリペイをバインドする',
-  'app.settings.binding.alipay-description':
-    '現在バインドされていないアリペイアカウント',
+    'Currently unbound external account',
+  'app.settings.binding.alipay': 'Binding SSO Account',
+  'app.settings.binding.alipay-description': 'Currently unbound SSO account',
   'app.settings.binding.dingding': 'ディントークをバインドする',
   'app.settings.binding.dingding-description':
     '現在バインドされていないディントークアカウント',

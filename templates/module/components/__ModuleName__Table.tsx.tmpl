@@ -1,0 +1,85 @@
+import { Button, Popconfirm, Space, Table } from 'antd';
+import type { TableProps } from 'antd';
+import { BizStatusTag } from '@/components';
+import type { PageResult } from '@/types';
+import { __ModuleName___STATUS_TAG_OPTIONS } from '../constants';
+import type { __ModuleName__Item } from '../types';
+
+interface __ModuleName__TableProps {
+  data?: PageResult<__ModuleName__Item>;
+  loading?: boolean;
+  onPageChange: (pageNo: number, pageSize: number) => void;
+  onView: (record: __ModuleName__Item) => void;
+  onEdit: (record: __ModuleName__Item) => void;
+  onDelete: (record: __ModuleName__Item) => void;
+}
+
+const __ModuleName__Table = ({
+  data,
+  loading,
+  onPageChange,
+  onView,
+  onEdit,
+  onDelete,
+}: __ModuleName__TableProps) => {
+  const columns: TableProps<__ModuleName__Item>['columns'] = [
+    { title: '名称', dataIndex: 'name', key: 'name' },
+    { title: '编码', dataIndex: 'code', key: 'code' },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (value: __ModuleName__Item['status']) => (
+        <BizStatusTag value={value} options={__ModuleName___STATUS_TAG_OPTIONS} />
+      ),
+    },
+    { title: '负责人', dataIndex: 'owner', key: 'owner' },
+    { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+    {
+      title: '操作',
+      key: 'action',
+      width: 180,
+      render: (_, record) => (
+        <Space>
+          <Button type="link" onClick={() => onView(record)}>
+            详情
+          </Button>
+          <Button type="link" onClick={() => onEdit(record)}>
+            编辑
+          </Button>
+          <Popconfirm
+            title="确认删除该数据？"
+            description="删除后仅影响当前本地示例数据。"
+            okText="删除"
+            okButtonProps={{ danger: true }}
+            onConfirm={() => onDelete(record)}
+          >
+            <Button danger type="link">
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <Table<__ModuleName__Item>
+      columns={columns}
+      dataSource={data?.records}
+      loading={loading}
+      rowKey="id"
+      pagination={{
+        current: data?.pageNo ?? 1,
+        pageSize: data?.pageSize ?? 10,
+        total: data?.total ?? 0,
+        showSizeChanger: true,
+      }}
+      onChange={(pagination) => {
+        onPageChange(pagination.current ?? 1, pagination.pageSize ?? 10);
+      }}
+    />
+  );
+};
+
+export default __ModuleName__Table;

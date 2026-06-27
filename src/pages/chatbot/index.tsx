@@ -7,6 +7,10 @@ import type {
 } from '@ant-design/x/es/bubble/interface';
 import XMarkdown from '@ant-design/x-markdown';
 import { useXChat } from '@ant-design/x-sdk';
+import type {
+  XModelMessage,
+  XModelParams,
+} from '@ant-design/x-sdk/es/chat-providers/types/model';
 import { Avatar, Card } from 'antd';
 import React, {
   useCallback,
@@ -48,8 +52,12 @@ const TypewriterTitle: React.FC = () => {
   );
 };
 
-const parser = (message: { content: string; role: string }): ParsedMessage => {
-  const { content, role } = message;
+const getMessageContent = (message: XModelMessage) =>
+  typeof message.content === 'string' ? message.content : message.content.text;
+
+const parser = (message: XModelMessage): ParsedMessage => {
+  const { role } = message;
+  const content = getMessageContent(message);
   if (role !== 'assistant') return { role: 'user', content };
 
   const trimmed = content.trimStart();
@@ -147,7 +155,7 @@ const ChatbotPage: React.FC = () => {
     },
     {
       key: 'preset-6',
-      label: '🚀 Ant Design Pro 如何接入后端权限系统？',
+      label: '🚀 Admin Template 如何接入后端权限系统？',
       group: '更早',
     },
     {
@@ -164,10 +172,11 @@ const ChatbotPage: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('default');
   const [inputValue, setInputValue] = useState('');
 
-  const provider = useMemo(() => createChatProvider() as any, []);
+  const provider = useMemo(() => createChatProvider(), []);
   const { onRequest, abort, isRequesting, parsedMessages } = useXChat<
-    any,
-    ParsedMessage
+    XModelMessage,
+    ParsedMessage,
+    XModelParams
   >({
     provider,
     conversationKey: activeKey,

@@ -23,7 +23,7 @@ const generateTableData = (count: number): RuleListItem[] => {
   return Array.from({ length: count }, (_, i) => ({
     key: i,
     disabled: i % 6 === 0,
-    href: 'https://ant.design',
+    href: '#',
     avatar: avatars[i % 2],
     name: `TradeCode ${i}`,
     owner: '曲丽丽',

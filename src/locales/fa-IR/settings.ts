@@ -40,12 +40,11 @@ export default {
   'app.settings.security.modify': 'تغییر',
   'app.settings.security.set': 'تنظیم',
   'app.settings.security.bind': 'بستن',
-  'app.settings.binding.taobao': 'اتصال Taobao',
+  'app.settings.binding.taobao': 'Binding External Account',
   'app.settings.binding.taobao-description':
-    'حساب Taobao در حال حاضر بسته نشده است',
-  'app.settings.binding.alipay': 'اتصال Alipay',
-  'app.settings.binding.alipay-description':
-    'حساب Alipay در حال حاضر بسته نشده است',
+    'Currently unbound external account',
+  'app.settings.binding.alipay': 'Binding SSO Account',
+  'app.settings.binding.alipay-description': 'Currently unbound SSO account',
   'app.settings.binding.dingding': 'اتصال DingTalk',
   'app.settings.binding.dingding-description':
     'حساب DingTalk در حال حاضر محدود نشده است',

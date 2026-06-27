@@ -1,0 +1,15 @@
+import type { BizStatusOption } from '@/components';
+import type { OptionItem } from '@/types';
+import type { __ModuleName__Status } from './types';
+
+export const __ModuleName___STATUS_OPTIONS: OptionItem<__ModuleName__Status>[] = [
+  { label: '启用', value: 1 },
+  { label: '禁用', value: 0 },
+];
+
+export const __ModuleName___STATUS_TAG_OPTIONS: BizStatusOption[] = [
+  { label: '启用', value: 1, color: 'success' },
+  { label: '禁用', value: 0, color: 'default' },
+];
+
+export const DEFAULT_PAGE_SIZE = 10;

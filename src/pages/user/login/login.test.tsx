@@ -2,11 +2,30 @@
 import { startMock } from '@@/requestRecordMock';
 import { TestBrowser } from '@@/testBrowser';
 import { fireEvent, render } from '@testing-library/react';
+import type { Location as HistoryLocation } from 'history';
 import React, { act } from 'react';
 
 let server: {
   close: () => void;
 };
+
+type HistoryWithPush = HistoryLocation & {
+  push: (path: string) => void;
+};
+
+const createHistoryRef = (): React.MutableRefObject<HistoryLocation> => ({
+  current: {
+    pathname: '/user/login',
+    search: '',
+    hash: '',
+    state: null,
+    key: 'test',
+  },
+});
+
+const getHistory = (
+  historyRef: React.MutableRefObject<HistoryLocation>,
+): HistoryWithPush => historyRef.current as HistoryWithPush;
 
 describe('Login Page', () => {
   beforeAll(async () => {
@@ -21,7 +40,7 @@ describe('Login Page', () => {
   });
 
   it('should show login form', async () => {
-    const historyRef = React.createRef<any>();
+    const historyRef = createHistoryRef();
     const rootContainer = render(
       <TestBrowser
         historyRef={historyRef}
@@ -31,18 +50,16 @@ describe('Login Page', () => {
       />,
     );
 
-    await rootContainer.findAllByText('Ant Design');
+    await rootContainer.findAllByText('Admin Template');
 
     act(() => {
-      historyRef.current?.push('/user/login');
+      getHistory(historyRef).push('/user/login');
     });
 
     expect(
       rootContainer.baseElement?.querySelector('.ant-pro-form-login-desc')
         ?.textContent,
-    ).toBe(
-      'Ant Design is the most influential web design specification in Xihu district',
-    );
+    ).toBe('Enterprise admin scaffold for Java REST API / OpenAPI backends');
 
     expect(rootContainer.asFragment()).toMatchSnapshot();
 
@@ -50,7 +67,7 @@ describe('Login Page', () => {
   });
 
   it('should login success', async () => {
-    const historyRef = React.createRef<any>();
+    const historyRef = createHistoryRef();
     const rootContainer = render(
       <TestBrowser
         historyRef={historyRef}
@@ -60,7 +77,7 @@ describe('Login Page', () => {
       />,
     );
 
-    await rootContainer.findAllByText('Ant Design');
+    await rootContainer.findAllByText('Admin Template');
 
     const userNameInput = await rootContainer.findByPlaceholderText(
       'Username: admin or user',
@@ -71,17 +88,17 @@ describe('Login Page', () => {
     });
 
     const passwordInput = await rootContainer.findByPlaceholderText(
-      'Password: ant.design',
+      'Password: admin.template',
     );
 
     act(() => {
-      fireEvent.change(passwordInput, { target: { value: 'ant.design' } });
+      fireEvent.change(passwordInput, { target: { value: 'admin.template' } });
     });
 
     await (await rootContainer.findByText('Login')).click();
 
     // Wait for login to succeed and navigate to home page
-    await rootContainer.findByText(/Ant Design Pro/, undefined, {
+    await rootContainer.findByText(/Admin Template/, undefined, {
       timeout: 10000,
     });
 

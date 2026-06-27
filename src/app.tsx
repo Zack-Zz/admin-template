@@ -95,13 +95,13 @@ export const layout: RunTimeLayoutConfig = ({
         (initialState?.settings as { locale?: boolean })?.locale !== false;
       return [
         <DocLink key="doc" />,
-        <VersionDropdown key="version" />,
+        <VersionDropdown key="project-links" />,
         localeEnabled && <LangDropdown key="lang" />,
       ].filter(Boolean);
     },
     avatarProps: {
       src: initialState?.currentUser?.avatar,
-      title: 'ProUser',
+      title: 'Admin User',
       render: (_, avatarChildren) => (
         <AvatarDropdown>{avatarChildren}</AvatarDropdown>
       ),
@@ -190,7 +190,7 @@ export const layout: RunTimeLayoutConfig = ({
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request: RequestConfig = {
-  baseURL: isDev ? '' : 'https://pro-api.ant-design-demo.workers.dev',
+  baseURL: '',
   ...errorConfig,
 };
 

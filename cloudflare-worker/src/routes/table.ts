@@ -110,7 +110,7 @@ app.post('/rule', async (c) => {
   if (method === 'post') {
     const newItem: RuleListItem = {
       key: tableListDataSource.length,
-      href: 'https://ant.design',
+      href: '#',
       avatar:
         'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
       name: name || 'New Item',
