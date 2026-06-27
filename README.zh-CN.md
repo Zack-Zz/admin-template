@@ -9,6 +9,7 @@
 - ProLayout 布局、登录页、路由和权限约定。
 - Umi Max request、错误处理和 OpenAPI 生成目录约定。
 - 标准 CRUD 示例模块：`src/pages/system/example/`。
+- 中文为主的业务开发规范：`docs/development-standard.md`。
 - 轻量业务组件：`src/components/biz/`。
 - 模块生成器：`npm run gen:module`。
 - Codex / AI coding agent 项目约束：`AGENTS.md`、`CLAUDE.md`、`docs/codex-prompt.md`。
@@ -62,25 +63,35 @@ src/app.tsx                  运行时配置、初始用户态、Layout、reques
 src/access.ts                权限约定
 src/components/biz/          业务公共组件
 src/pages/system/example/    标准 CRUD 示例模块
-src/services/ant-design-pro/ OpenAPI 自动生成目录，不手工编辑
+src/services/openapi/ OpenAPI 自动生成目录，不手工编辑
 src/types/                   通用类型与 API 契约类型
 scripts/generate-module.mjs  模块生成器
 templates/module/            模块生成模板
 ```
 
+## 文档入口
+
+- [业务开发主规范](./docs/development-standard.md)
+- [业务项目接入清单](./docs/project-setup.md)
+- [模块开发规范](./docs/module-development.md)
+- [API 契约与适配边界](./docs/api-contract.md)
+- [模块交付自检清单](./docs/checklists/module-review.md)
+- [Codex 提示词](./docs/codex-prompt.md)
+
 ## 开发约束
 
 - 新增后台页面优先参考 `src/pages/system/example/`。
 - 页面目录保持 `index.tsx`、`service.ts`、`types.ts`、`constants.ts`、`components/` 共置。
+- 默认 CRUD 页面使用 `PageContainer`、`ProTable`、`ModalForm` / `ProForm`、`ProDescriptions`。
 - UI 优先级：项目现有 Ant Design Pro / Umi Max 能力 → ProComponents → Ant Design 基础组件 → `src/components/biz/` 薄封装。
 - 禁止引入 MUI、Chakra UI、Arco Design、Element、Naive UI 等其他 UI 体系。
 - 禁止脱离 Ant Design Pro 自行设计页面风格。
 - 禁止重写 Ant Design / ProComponents 已有基础能力。
 - 禁止在业务页面中写大段自定义 CSS。
 - 禁止新增复杂低代码 CRUD 引擎。
-- API 调用走 Umi request、生成服务或页面级 `service.ts`。
+- API 调用走 Umi request、生成服务或页面级 `service.ts`，并把后端响应适配为项目内部类型。
 - 接口不存在时只写 TODO 或本地 mock promise，不编造真实 URL。
-- `src/services/ant-design-pro/` 是自动生成目录，必须通过 `npm run openapi` 更新。
+- `src/services/openapi/` 是自动生成目录，必须通过 `npm run openapi` 更新。
 - 不要手动运行 `npm run simple`，本项目已经完成裁剪。
 - 不要 push 到远程仓库，除非用户明确要求。
 
@@ -94,7 +105,11 @@ npm run gen:module -- --name organization --group system --title 组织管理
 
 ## 国际化
 
-项目保留 Umi Max i18n。默认语言是 `en-US`，用户可以通过右上角语言菜单切换。`README.md` 是英文入口，`README.zh-CN.md` 是简体中文版本。
+项目保留 Umi Max i18n，默认只维护 `en-US` 和 `zh-CN`。默认语言是 `en-US`，用户可以通过右上角语言菜单切换。如果业务项目只保留一套语言，语言切换入口会自动隐藏。
+
+## 权限
+
+项目保留轻量权限约定。路由权限使用 `config/routes.ts` 的 `access` 字段和 `src/access.ts`；当前内置 `canAdmin`，判断 `currentUser.access === 'admin'`。按钮权限通过 `BizPermissionButton permissionCode` 标注，建议命名为 `system:example:create` 这类 `<domain>:<module>:<action>` 格式。
 
 ## 验证
 

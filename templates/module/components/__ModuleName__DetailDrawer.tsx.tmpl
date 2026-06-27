@@ -1,4 +1,9 @@
-import { BizDetailDrawer, BizStatusTag } from '@/components';
+import {
+  ProDescriptions,
+  type ProDescriptionsItemProps,
+} from '@ant-design/pro-components';
+import { Drawer } from 'antd';
+import { BizStatusTag } from '@/components';
 import { __ModuleName___STATUS_TAG_OPTIONS } from '../constants';
 import type { __ModuleName__Item } from '../types';
 
@@ -13,34 +18,45 @@ const __ModuleName__DetailDrawer = ({
   record,
   onClose,
 }: __ModuleName__DetailDrawerProps) => {
+  const columns: ProDescriptionsItemProps<__ModuleName__Item>[] = [
+    { title: '名称', dataIndex: 'name' },
+    { title: '编码', dataIndex: 'code' },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      render: (_, entity) => (
+        <BizStatusTag
+          value={entity.status}
+          options={__ModuleName___STATUS_TAG_OPTIONS}
+        />
+      ),
+    },
+    { title: '负责人', dataIndex: 'owner' },
+    {
+      title: '描述',
+      dataIndex: 'description',
+      render: (_, entity) => entity.description || '-',
+    },
+    { title: '创建时间', dataIndex: 'createdAt' },
+    { title: '更新时间', dataIndex: 'updatedAt' },
+  ];
+
   return (
-    <BizDetailDrawer
+    <Drawer
       title="__moduleTitle__详情"
       open={open}
       onClose={onClose}
-      items={[
-        { key: 'name', label: '名称', children: record?.name ?? '-' },
-        { key: 'code', label: '编码', children: record?.code ?? '-' },
-        {
-          key: 'status',
-          label: '状态',
-          children: (
-            <BizStatusTag
-              value={record?.status}
-              options={__ModuleName___STATUS_TAG_OPTIONS}
-            />
-          ),
-        },
-        { key: 'owner', label: '负责人', children: record?.owner ?? '-' },
-        {
-          key: 'description',
-          label: '描述',
-          children: record?.description || '-',
-        },
-        { key: 'createdAt', label: '创建时间', children: record?.createdAt ?? '-' },
-        { key: 'updatedAt', label: '更新时间', children: record?.updatedAt ?? '-' },
-      ]}
-    />
+      size={600}
+      destroyOnHidden
+    >
+      {record && (
+        <ProDescriptions<__ModuleName__Item>
+          column={1}
+          dataSource={record}
+          columns={columns}
+        />
+      )}
+    </Drawer>
   );
 };
 

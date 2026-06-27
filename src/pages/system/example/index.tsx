@@ -1,53 +1,23 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-components';
+import { type ActionType, PageContainer } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
 import { message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
-import { BizPermissionButton, BizToolbar } from '@/components';
-import type { PageResult } from '@/types';
+import { useRef, useState } from 'react';
+import { BizPermissionButton } from '@/components';
 import ExampleDetailDrawer from './components/ExampleDetailDrawer';
 import ExampleFormModal from './components/ExampleFormModal';
-import ExampleSearchForm from './components/ExampleSearchForm';
 import ExampleTable from './components/ExampleTable';
-import { DEFAULT_PAGE_SIZE } from './constants';
-import {
-  createExample,
-  deleteExample,
-  queryExampleList,
-  updateExample,
-} from './service';
-import type { ExampleFormValues, ExampleItem, ExampleQuery } from './types';
-
-const defaultQuery: ExampleQuery = {
-  pageNo: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
+import { createExample, deleteExample, updateExample } from './service';
+import type { ExampleFormValues, ExampleItem } from './types';
 
 const ExamplePage = () => {
   const intl = useIntl();
+  const actionRef = useRef<ActionType | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
-  const [query, setQuery] = useState<ExampleQuery>(defaultQuery);
-  const [data, setData] = useState<PageResult<ExampleItem>>();
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<ExampleItem>();
   const [detailOpen, setDetailOpen] = useState(false);
-
-  const loadData = useCallback(async (nextQuery: ExampleQuery) => {
-    setLoading(true);
-    try {
-      const result = await queryExampleList(nextQuery);
-      setData(result);
-      setQuery(nextQuery);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadData(defaultQuery);
-  }, [loadData]);
 
   const closeForm = () => {
     setFormOpen(false);
@@ -75,7 +45,7 @@ const ExamplePage = () => {
         );
       }
       closeForm();
-      await loadData({ ...query, pageNo: 1 });
+      await actionRef.current?.reload();
     } finally {
       setSaving(false);
     }
@@ -89,63 +59,41 @@ const ExamplePage = () => {
         defaultMessage: 'Example data deleted',
       }),
     );
-    await loadData(query);
+    await actionRef.current?.reload();
   };
 
   return (
     <PageContainer>
       {contextHolder}
-      <div className="rounded bg-white p-6">
-        <BizToolbar
-          title={intl.formatMessage({
-            id: 'pages.system.example.title',
-            defaultMessage: 'Example Management',
-          })}
-          extra={
-            <BizPermissionButton
-              permissionCode="system:example:create"
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setCurrentRecord(undefined);
-                setFormOpen(true);
-              }}
-            >
-              {intl.formatMessage({
-                id: 'pages.system.example.action.create',
-                defaultMessage: 'New',
-              })}
-            </BizPermissionButton>
-          }
-        />
-        <div className="mb-4">
-          <ExampleSearchForm
-            loading={loading}
-            onSearch={(values) => {
-              void loadData({ ...query, ...values, pageNo: 1 });
+      <ExampleTable
+        actionRef={actionRef}
+        toolBarRender={() => [
+          <BizPermissionButton
+            key="create"
+            permissionCode="system:example:create"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setCurrentRecord(undefined);
+              setFormOpen(true);
             }}
-            onReset={() => {
-              void loadData(defaultQuery);
-            }}
-          />
-        </div>
-        <ExampleTable
-          data={data}
-          loading={loading}
-          onPageChange={(pageNo, pageSize) => {
-            void loadData({ ...query, pageNo, pageSize });
-          }}
-          onView={(record) => {
-            setCurrentRecord(record);
-            setDetailOpen(true);
-          }}
-          onEdit={(record) => {
-            setCurrentRecord(record);
-            setFormOpen(true);
-          }}
-          onDelete={handleDelete}
-        />
-      </div>
+          >
+            {intl.formatMessage({
+              id: 'pages.system.example.action.create',
+              defaultMessage: 'New',
+            })}
+          </BizPermissionButton>,
+        ]}
+        onView={(record) => {
+          setCurrentRecord(record);
+          setDetailOpen(true);
+        }}
+        onEdit={(record) => {
+          setCurrentRecord(record);
+          setFormOpen(true);
+        }}
+        onDelete={handleDelete}
+      />
       <ExampleFormModal
         open={formOpen}
         mode={currentRecord ? 'edit' : 'create'}

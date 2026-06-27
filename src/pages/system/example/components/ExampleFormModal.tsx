@@ -1,6 +1,10 @@
+import {
+  ModalForm,
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Form, Input } from 'antd';
-import { BizDictSelect, BizFormModal } from '@/components';
 import { EXAMPLE_STATUS_OPTIONS } from '../constants';
 import type { ExampleFormValues, ExampleItem } from '../types';
 
@@ -34,7 +38,8 @@ const ExampleFormModal = ({
   }));
 
   return (
-    <BizFormModal<ExampleFormValues>
+    <ModalForm<ExampleFormValues>
+      key={values?.id ?? 'create'}
       title={intl.formatMessage({
         id:
           mode === 'create'
@@ -43,12 +48,24 @@ const ExampleFormModal = ({
         defaultMessage: mode === 'create' ? 'New Example' : 'Edit Example',
       })}
       open={open}
-      confirmLoading={confirmLoading}
       initialValues={values ?? { status: 1 }}
-      onCancel={onCancel}
-      onSubmit={onSubmit}
+      modalProps={{
+        destroyOnHidden: true,
+        okButtonProps: { loading: confirmLoading },
+        onCancel,
+      }}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          onCancel();
+        }
+      }}
+      onFinish={async (formValues) => {
+        await onSubmit(formValues);
+
+        return true;
+      }}
     >
-      <Form.Item
+      <ProFormText
         name="name"
         label={intl.formatMessage({
           id: 'pages.system.example.field.name',
@@ -63,16 +80,15 @@ const ExampleFormModal = ({
             }),
           },
         ]}
-      >
-        <Input
-          maxLength={40}
-          placeholder={intl.formatMessage({
-            id: 'pages.system.example.placeholder.name',
-            defaultMessage: 'Input name',
-          })}
-        />
-      </Form.Item>
-      <Form.Item
+        fieldProps={{
+          maxLength: 40,
+        }}
+        placeholder={intl.formatMessage({
+          id: 'pages.system.example.placeholder.name',
+          defaultMessage: 'Input name',
+        })}
+      />
+      <ProFormText
         name="code"
         label={intl.formatMessage({
           id: 'pages.system.example.field.code',
@@ -87,16 +103,15 @@ const ExampleFormModal = ({
             }),
           },
         ]}
-      >
-        <Input
-          maxLength={40}
-          placeholder={intl.formatMessage({
-            id: 'pages.system.example.placeholder.code',
-            defaultMessage: 'Input code',
-          })}
-        />
-      </Form.Item>
-      <Form.Item
+        fieldProps={{
+          maxLength: 40,
+        }}
+        placeholder={intl.formatMessage({
+          id: 'pages.system.example.placeholder.code',
+          defaultMessage: 'Input code',
+        })}
+      />
+      <ProFormSelect
         name="status"
         label={intl.formatMessage({
           id: 'pages.system.example.field.status',
@@ -111,16 +126,13 @@ const ExampleFormModal = ({
             }),
           },
         ]}
-      >
-        <BizDictSelect
-          options={statusOptions}
-          placeholder={intl.formatMessage({
-            id: 'pages.system.example.placeholder.status',
-            defaultMessage: 'Select status',
-          })}
-        />
-      </Form.Item>
-      <Form.Item
+        options={statusOptions}
+        placeholder={intl.formatMessage({
+          id: 'pages.system.example.placeholder.status',
+          defaultMessage: 'Select status',
+        })}
+      />
+      <ProFormText
         name="owner"
         label={intl.formatMessage({
           id: 'pages.system.example.field.owner',
@@ -135,32 +147,30 @@ const ExampleFormModal = ({
             }),
           },
         ]}
-      >
-        <Input
-          maxLength={40}
-          placeholder={intl.formatMessage({
-            id: 'pages.system.example.placeholder.owner',
-            defaultMessage: 'Input owner',
-          })}
-        />
-      </Form.Item>
-      <Form.Item
+        fieldProps={{
+          maxLength: 40,
+        }}
+        placeholder={intl.formatMessage({
+          id: 'pages.system.example.placeholder.owner',
+          defaultMessage: 'Input owner',
+        })}
+      />
+      <ProFormTextArea
         name="description"
         label={intl.formatMessage({
           id: 'pages.system.example.field.description',
           defaultMessage: 'Description',
         })}
-      >
-        <Input.TextArea
-          maxLength={200}
-          placeholder={intl.formatMessage({
-            id: 'pages.system.example.placeholder.description',
-            defaultMessage: 'Input description',
-          })}
-          showCount
-        />
-      </Form.Item>
-    </BizFormModal>
+        fieldProps={{
+          maxLength: 200,
+          showCount: true,
+        }}
+        placeholder={intl.formatMessage({
+          id: 'pages.system.example.placeholder.description',
+          defaultMessage: 'Input description',
+        })}
+      />
+    </ModalForm>
   );
 };
 

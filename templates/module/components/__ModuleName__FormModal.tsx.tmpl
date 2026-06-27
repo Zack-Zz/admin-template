@@ -1,5 +1,9 @@
-import { Form, Input } from 'antd';
-import { BizDictSelect, BizFormModal } from '@/components';
+import {
+  ModalForm,
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
 import { __ModuleName___STATUS_OPTIONS } from '../constants';
 import type { __ModuleName__FormValues, __ModuleName__Item } from '../types';
 
@@ -21,46 +25,62 @@ const __ModuleName__FormModal = ({
   onSubmit,
 }: __ModuleName__FormModalProps) => {
   return (
-    <BizFormModal<__ModuleName__FormValues>
+    <ModalForm<__ModuleName__FormValues>
+      key={values?.id ?? 'create'}
       title={mode === 'create' ? '新增__moduleTitle__' : '编辑__moduleTitle__'}
       open={open}
-      confirmLoading={confirmLoading}
       initialValues={values ?? { status: 1 }}
-      onCancel={onCancel}
-      onSubmit={onSubmit}
+      modalProps={{
+        destroyOnHidden: true,
+        okButtonProps: { loading: confirmLoading },
+        onCancel,
+      }}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          onCancel();
+        }
+      }}
+      onFinish={async (formValues) => {
+        await onSubmit(formValues);
+
+        return true;
+      }}
     >
-      <Form.Item
+      <ProFormText
         name="name"
         label="名称"
         rules={[{ required: true, message: '请输入名称' }]}
-      >
-        <Input maxLength={40} placeholder="请输入名称" />
-      </Form.Item>
-      <Form.Item
+        fieldProps={{ maxLength: 40 }}
+        placeholder="请输入名称"
+      />
+      <ProFormText
         name="code"
         label="编码"
         rules={[{ required: true, message: '请输入编码' }]}
-      >
-        <Input maxLength={40} placeholder="请输入编码" />
-      </Form.Item>
-      <Form.Item
+        fieldProps={{ maxLength: 40 }}
+        placeholder="请输入编码"
+      />
+      <ProFormSelect
         name="status"
         label="状态"
         rules={[{ required: true, message: '请选择状态' }]}
-      >
-        <BizDictSelect options={__ModuleName___STATUS_OPTIONS} placeholder="请选择状态" />
-      </Form.Item>
-      <Form.Item
+        options={__ModuleName___STATUS_OPTIONS}
+        placeholder="请选择状态"
+      />
+      <ProFormText
         name="owner"
         label="负责人"
         rules={[{ required: true, message: '请输入负责人' }]}
-      >
-        <Input maxLength={40} placeholder="请输入负责人" />
-      </Form.Item>
-      <Form.Item name="description" label="描述">
-        <Input.TextArea maxLength={200} placeholder="请输入描述" showCount />
-      </Form.Item>
-    </BizFormModal>
+        fieldProps={{ maxLength: 40 }}
+        placeholder="请输入负责人"
+      />
+      <ProFormTextArea
+        name="description"
+        label="描述"
+        fieldProps={{ maxLength: 200, showCount: true }}
+        placeholder="请输入描述"
+      />
+    </ModalForm>
   );
 };
 

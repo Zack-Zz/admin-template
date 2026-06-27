@@ -1,8 +1,10 @@
-# API Contract
+# API Contract And Adapter Boundary
 
-## Default Envelope
+`ApiResult<T>`、`PageResult<T>` 和 `PageQuery` 是前端项目内部标准，不要求每个服务端项目天然返回同样结构。真实接入时，在 OpenAPI 生成服务、页面级 `service.ts` 或 request response interceptor 中完成适配。
 
-The scaffold assumes Java backend responses can be normalized to this shape:
+## Internal Envelope
+
+The scaffold consumes this internal shape after adaptation:
 
 ```ts
 interface ApiResult<T> {
@@ -12,11 +14,11 @@ interface ApiResult<T> {
 }
 ```
 
-This is a default convention, not a live backend integration.
+This is a frontend convention, not a live backend requirement.
 
 ## Pagination
 
-Default paginated data:
+Default internal paginated data:
 
 ```ts
 interface PageResult<T> {
@@ -49,13 +51,13 @@ The project keeps the Umi Max request runtime:
 - `src/app.tsx` exports `request`.
 - `src/requestErrorConfig.ts` owns `errorThrower`, `errorHandler`, request interceptors, and response interceptors.
 
-Do not add a competing global request wrapper unless there is a concrete need. Page services should use generated OpenAPI services or Umi Max `request`.
+Do not add a competing global request wrapper unless there is a concrete need. Page services should use generated OpenAPI services or Umi Max `request`, then normalize responses to project internal types.
 
 ## Error Handling
 
-The current template still contains Ant Design Pro's `success/errorCode/errorMessage/showType` error handler. When a Java backend is connected, align one of these approaches:
+The current template still contains Ant Design Pro's `success/errorCode/errorMessage/showType` error handler. When a backend is connected, align one of these approaches:
 
-- Convert backend `ApiResult<T>` to the current success-based error handler in a response interceptor.
+- Convert backend responses to the current success-based error handler in a response interceptor.
 - Or update `ResponseStructure` and `errorThrower` to use `code`, `message`, and `data`.
 
 Do this only when a real backend contract exists.
@@ -75,14 +77,14 @@ Future integration point:
 // const tenantId = localStorage.getItem('tenantId');
 ```
 
-Keep this logic in request interceptors. Do not add token or tenant handling inside individual page components.
+Keep this logic in request interceptors. Do not add token, tenant, trace, or authorization handling inside individual page components.
 
 ## OpenAPI
 
 OpenAPI generation is already configured in `config/config.ts`:
 
 - schema: `config/oneapi.json`
-- generated services: `src/services/ant-design-pro/`
+- generated services: `src/services/openapi/`
 - command: `npm run openapi`
 
 Do not hand-edit generated service files. Update the OpenAPI schema and regenerate.

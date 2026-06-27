@@ -1,55 +1,25 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-components';
+import { type ActionType, PageContainer } from '@ant-design/pro-components';
 import { message } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
-import { BizPermissionButton, BizToolbar } from '@/components';
-import type { PageResult } from '@/types';
-import { DEFAULT_PAGE_SIZE } from './constants';
+import { useRef, useState } from 'react';
+import { BizPermissionButton } from '@/components';
 import __ModuleName__DetailDrawer from './components/__ModuleName__DetailDrawer';
 import __ModuleName__FormModal from './components/__ModuleName__FormModal';
-import __ModuleName__SearchForm from './components/__ModuleName__SearchForm';
 import __ModuleName__Table from './components/__ModuleName__Table';
 import {
   create__ModuleName__,
   delete__ModuleName__,
-  query__ModuleName__List,
   update__ModuleName__,
 } from './service';
-import type {
-  __ModuleName__FormValues,
-  __ModuleName__Item,
-  __ModuleName__Query,
-} from './types';
-
-const defaultQuery: __ModuleName__Query = {
-  pageNo: 1,
-  pageSize: DEFAULT_PAGE_SIZE,
-};
+import type { __ModuleName__FormValues, __ModuleName__Item } from './types';
 
 const __ModuleName__Page = () => {
+  const actionRef = useRef<ActionType | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
-  const [query, setQuery] = useState<__ModuleName__Query>(defaultQuery);
-  const [data, setData] = useState<PageResult<__ModuleName__Item>>();
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<__ModuleName__Item>();
   const [detailOpen, setDetailOpen] = useState(false);
-
-  const loadData = useCallback(async (nextQuery: __ModuleName__Query) => {
-    setLoading(true);
-    try {
-      const result = await query__ModuleName__List(nextQuery);
-      setData(result);
-      setQuery(nextQuery);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadData(defaultQuery);
-  }, [loadData]);
 
   const closeForm = () => {
     setFormOpen(false);
@@ -67,7 +37,7 @@ const __ModuleName__Page = () => {
         messageApi.success('__moduleTitle__已新增');
       }
       closeForm();
-      await loadData({ ...query, pageNo: 1 });
+      await actionRef.current?.reload();
     } finally {
       setSaving(false);
     }
@@ -76,57 +46,38 @@ const __ModuleName__Page = () => {
   const handleDelete = async (record: __ModuleName__Item) => {
     await delete__ModuleName__(record.id);
     messageApi.success('__moduleTitle__已删除');
-    await loadData(query);
+    await actionRef.current?.reload();
   };
 
   return (
     <PageContainer>
       {contextHolder}
-      <div className="rounded bg-white p-6">
-        <BizToolbar
-          title="__moduleTitle__"
-          extra={
-            <BizPermissionButton
-              permissionCode="__groupName__:__modulePath__:create"
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setCurrentRecord(undefined);
-                setFormOpen(true);
-              }}
-            >
-              新增
-            </BizPermissionButton>
-          }
-        />
-        <div className="mb-4">
-          <__ModuleName__SearchForm
-            loading={loading}
-            onSearch={(values) => {
-              void loadData({ ...query, ...values, pageNo: 1 });
+      <__ModuleName__Table
+        actionRef={actionRef}
+        toolBarRender={() => [
+          <BizPermissionButton
+            key="create"
+            permissionCode="__groupName__:__modulePath__:create"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setCurrentRecord(undefined);
+              setFormOpen(true);
             }}
-            onReset={() => {
-              void loadData(defaultQuery);
-            }}
-          />
-        </div>
-        <__ModuleName__Table
-          data={data}
-          loading={loading}
-          onPageChange={(pageNo, pageSize) => {
-            void loadData({ ...query, pageNo, pageSize });
-          }}
-          onView={(record) => {
-            setCurrentRecord(record);
-            setDetailOpen(true);
-          }}
-          onEdit={(record) => {
-            setCurrentRecord(record);
-            setFormOpen(true);
-          }}
-          onDelete={handleDelete}
-        />
-      </div>
+          >
+            新增
+          </BizPermissionButton>,
+        ]}
+        onView={(record) => {
+          setCurrentRecord(record);
+          setDetailOpen(true);
+        }}
+        onEdit={(record) => {
+          setCurrentRecord(record);
+          setFormOpen(true);
+        }}
+        onDelete={handleDelete}
+      />
       <__ModuleName__FormModal
         open={formOpen}
         mode={currentRecord ? 'edit' : 'create'}

@@ -5,8 +5,11 @@
 ## 优先阅读
 
 - 架构说明：`docs/architecture.md`
+- 业务开发主规范：`docs/development-standard.md`
+- 项目接入清单：`docs/project-setup.md`
 - 模块开发：`docs/module-development.md`
 - API 契约：`docs/api-contract.md`
+- 模块自检清单：`docs/checklists/module-review.md`
 - Codex 提示词：`docs/codex-prompt.md`
 - AI 开发约束：`AGENTS.md`
 
@@ -35,11 +38,15 @@ npm run gen:module -- --name organization --group system --title 组织管理
 
 ## 黄金样例
 
-后续 CRUD 页面优先参考 `src/pages/system/example/`。它展示了模块目录、局部 mock service、查询表单、表格、表单弹窗、详情抽屉、状态 Tag、分页和删除二次确认。
+后续 CRUD 页面优先参考 `src/pages/system/example/`。它展示了模块目录、局部 mock service、ProTable 查询/request 流程、表单弹窗、详情抽屉、状态 Tag、分页和删除二次确认。
 
 ## API 规则
 
-不要编造真实后端接口。后端契约明确后，使用 OpenAPI 生成服务或页面级 `service.ts`。脚手架示例只保留本地 mock promise 和 TODO。
+不要编造真实后端接口。后端契约明确后，使用 OpenAPI 生成服务或页面级 `service.ts`。页面组件消费项目内部类型，后端原始响应在 service 或 request interceptor 中适配。
+
+## 国际化
+
+默认只维护 `en-US` 和 `zh-CN`。默认语言是 `en-US`；如果业务项目只保留一套语言，语言切换入口会自动隐藏。
 
 ## 来源
 

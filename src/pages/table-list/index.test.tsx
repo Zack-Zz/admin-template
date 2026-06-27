@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as api from '@/services/ant-design-pro/api';
+import * as ruleApi from '@/services/openapi/rule';
 
 type ChildrenProps = {
   children?: ReactNode;
@@ -107,7 +107,7 @@ vi.mock('@umijs/max', () => ({
   ),
 }));
 
-vi.mock('@/services/ant-design-pro/api', () => ({
+vi.mock('@/services/openapi/rule', () => ({
   rule: vi.fn(),
   removeRule: vi.fn(),
   addRule: vi.fn(),
@@ -141,7 +141,7 @@ describe('TableList', () => {
     vi.clearAllMocks();
 
     // Mock rule API to return empty data
-    vi.mocked(api.rule).mockResolvedValue({
+    vi.mocked(ruleApi.rule).mockResolvedValue({
       data: [],
       total: 0,
       success: true,
@@ -180,7 +180,7 @@ describe('TableList', () => {
   });
 
   it('should render table after data loading', async () => {
-    const mockRemoveRule = vi.mocked(api.removeRule);
+    const mockRemoveRule = vi.mocked(ruleApi.removeRule);
     mockRemoveRule.mockResolvedValue({ success: true });
 
     render(
@@ -195,7 +195,7 @@ describe('TableList', () => {
   });
 
   it('should call rule API on mount', async () => {
-    vi.mocked(api.rule).mockResolvedValue({
+    vi.mocked(ruleApi.rule).mockResolvedValue({
       data: [],
       total: 0,
       success: true,
@@ -208,7 +208,7 @@ describe('TableList', () => {
     );
 
     await waitFor(() => {
-      expect(api.rule).toHaveBeenCalled();
+      expect(ruleApi.rule).toHaveBeenCalled();
     });
   });
 });

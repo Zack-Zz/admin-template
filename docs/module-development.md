@@ -1,5 +1,7 @@
 # Module Development
 
+业务模块规范以 `docs/development-standard.md` 为准，本文只展开模块目录和生成流程。
+
 ## Standard Module Shape
 
 New business modules should follow the example module:
@@ -11,13 +13,14 @@ src/pages/system/example/
   types.ts
   constants.ts
   components/
-    ExampleSearchForm.tsx
     ExampleTable.tsx
     ExampleFormModal.tsx
     ExampleDetailDrawer.tsx
 ```
 
 Use this shape for normal CRUD pages before creating new abstractions.
+
+The default implementation should follow `PageContainer + ProTable + ModalForm / ProForm + ProDescriptions`.
 
 ## Creating A Module
 
@@ -52,11 +55,13 @@ The generator does not edit routes automatically. Add the route manually in `con
 
 ## Page Rules
 
-- Keep query form, table, form modal, and detail drawer in separate files.
+- Use `ProTable` built-in search, pagination, toolbar, and request flow for normal CRUD pages.
+- Keep table, form modal, and detail drawer in separate files.
+- Split a dedicated search form only when `ProTable` search is not expressive enough.
 - Keep module-specific options in `constants.ts`.
 - Keep module-specific DTOs and view models in `types.ts`.
 - Keep request functions in `service.ts`.
-- Prefer `src/components/biz/` for common admin patterns.
+- Prefer ProComponents for admin surfaces. Use `src/components/biz/` only for thin business conveniences.
 - Avoid large page-level CSS. Follow Ant Design Pro defaults.
 
 ## Service Rules

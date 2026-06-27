@@ -1,44 +1,88 @@
-import { Button, Popconfirm, Space, Table } from 'antd';
-import type { TableProps } from 'antd';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
+import { Button, Popconfirm, Space } from 'antd';
+import type { ReactNode, RefObject } from 'react';
 import { BizStatusTag } from '@/components';
-import type { PageResult } from '@/types';
-import { __ModuleName___STATUS_TAG_OPTIONS } from '../constants';
-import type { __ModuleName__Item } from '../types';
+import {
+  DEFAULT_PAGE_SIZE,
+  __ModuleName___STATUS_OPTIONS,
+  __ModuleName___STATUS_TAG_OPTIONS,
+} from '../constants';
+import { query__ModuleName__List } from '../service';
+import type {
+  __ModuleName__Item,
+  __ModuleName__Query,
+  __ModuleName__Status,
+} from '../types';
+
+interface __ModuleName__TableParams extends Omit<__ModuleName__Query, 'status'> {
+  current?: number;
+  status?: __ModuleName__Status | string;
+}
 
 interface __ModuleName__TableProps {
-  data?: PageResult<__ModuleName__Item>;
-  loading?: boolean;
-  onPageChange: (pageNo: number, pageSize: number) => void;
+  actionRef?: RefObject<ActionType | null>;
+  toolBarRender?: () => ReactNode[];
   onView: (record: __ModuleName__Item) => void;
   onEdit: (record: __ModuleName__Item) => void;
-  onDelete: (record: __ModuleName__Item) => void;
+  onDelete: (record: __ModuleName__Item) => void | Promise<void>;
 }
 
 const __ModuleName__Table = ({
-  data,
-  loading,
-  onPageChange,
+  actionRef,
+  toolBarRender,
   onView,
   onEdit,
   onDelete,
 }: __ModuleName__TableProps) => {
-  const columns: TableProps<__ModuleName__Item>['columns'] = [
-    { title: '名称', dataIndex: 'name', key: 'name' },
-    { title: '编码', dataIndex: 'code', key: 'code' },
+  const statusValueEnum = Object.fromEntries(
+    __ModuleName___STATUS_OPTIONS.map((item) => [
+      String(item.value),
+      { text: item.label },
+    ]),
+  );
+  const normalizeStatus = (
+    status: __ModuleName__TableParams['status'],
+  ): __ModuleName__Status | undefined => {
+    if (status === undefined || status === '') {
+      return undefined;
+    }
+
+    return Number(status) as __ModuleName__Status;
+  };
+
+  const columns: ProColumns<__ModuleName__Item>[] = [
+    {
+      title: '关键字',
+      dataIndex: 'keyword',
+      hideInTable: true,
+      fieldProps: {
+        allowClear: true,
+        placeholder: '名称 / 编码 / 负责人',
+      },
+    },
+    { title: '名称', dataIndex: 'name', key: 'name', search: false },
+    { title: '编码', dataIndex: 'code', key: 'code', search: false },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (value: __ModuleName__Item['status']) => (
-        <BizStatusTag value={value} options={__ModuleName___STATUS_TAG_OPTIONS} />
+      valueType: 'select',
+      valueEnum: statusValueEnum,
+      render: (_, entity) => (
+        <BizStatusTag
+          value={entity.status}
+          options={__ModuleName___STATUS_TAG_OPTIONS}
+        />
       ),
     },
-    { title: '负责人', dataIndex: 'owner', key: 'owner' },
-    { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt' },
+    { title: '负责人', dataIndex: 'owner', key: 'owner', search: false },
+    { title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt', search: false },
     {
       title: '操作',
       key: 'action',
       width: 180,
+      valueType: 'option',
       render: (_, record) => (
         <Space>
           <Button type="link" onClick={() => onView(record)}>
@@ -64,19 +108,30 @@ const __ModuleName__Table = ({
   ];
 
   return (
-    <Table<__ModuleName__Item>
-      columns={columns}
-      dataSource={data?.records}
-      loading={loading}
+    <ProTable<__ModuleName__Item, __ModuleName__TableParams>
+      actionRef={actionRef}
+      headerTitle="__moduleTitle__"
       rowKey="id"
+      search={{ labelWidth: 100 }}
+      columns={columns}
       pagination={{
-        current: data?.pageNo ?? 1,
-        pageSize: data?.pageSize ?? 10,
-        total: data?.total ?? 0,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
         showSizeChanger: true,
       }}
-      onChange={(pagination) => {
-        onPageChange(pagination.current ?? 1, pagination.pageSize ?? 10);
+      toolBarRender={toolBarRender}
+      request={async (params) => {
+        const result = await query__ModuleName__List({
+          pageNo: params.current ?? 1,
+          pageSize: params.pageSize ?? DEFAULT_PAGE_SIZE,
+          keyword: params.keyword,
+          status: normalizeStatus(params.status),
+        });
+
+        return {
+          data: result.records,
+          total: result.total,
+          success: true,
+        };
       }}
     />
   );

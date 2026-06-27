@@ -1,24 +1,29 @@
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import type { TableProps } from 'antd';
-import { Button, Popconfirm, Space, Table } from 'antd';
+import { Button, Popconfirm, Space } from 'antd';
+import type { ReactNode, RefObject } from 'react';
 import { BizStatusTag } from '@/components';
-import type { PageResult } from '@/types';
-import { EXAMPLE_STATUS_TAG_OPTIONS } from '../constants';
-import type { ExampleItem } from '../types';
+import { DEFAULT_PAGE_SIZE, EXAMPLE_STATUS_TAG_OPTIONS } from '../constants';
+import { queryExampleList } from '../service';
+import type { ExampleItem, ExampleQuery, ExampleStatus } from '../types';
+
+interface ExampleTableParams extends Omit<ExampleQuery, 'status'> {
+  current?: number;
+  status?: ExampleStatus | string;
+}
 
 interface ExampleTableProps {
-  data?: PageResult<ExampleItem>;
-  loading?: boolean;
-  onPageChange: (pageNo: number, pageSize: number) => void;
+  actionRef?: RefObject<ActionType | null>;
+  toolBarRender?: () => ReactNode[];
   onView: (record: ExampleItem) => void;
   onEdit: (record: ExampleItem) => void;
-  onDelete: (record: ExampleItem) => void;
+  onDelete: (record: ExampleItem) => void | Promise<void>;
 }
 
 const ExampleTable = ({
-  data,
-  loading,
-  onPageChange,
+  actionRef,
+  toolBarRender,
   onView,
   onEdit,
   onDelete,
@@ -34,7 +39,35 @@ const ExampleTable = ({
       defaultMessage: String(item.label),
     }),
   }));
-  const columns: TableProps<ExampleItem>['columns'] = [
+  const statusValueEnum = Object.fromEntries(
+    statusOptions.map((item) => [String(item.value), { text: item.label }]),
+  );
+  const normalizeStatus = (
+    status: ExampleTableParams['status'],
+  ): ExampleStatus | undefined => {
+    if (status === undefined || status === '') {
+      return undefined;
+    }
+
+    return Number(status) as ExampleStatus;
+  };
+
+  const columns: ProColumns<ExampleItem>[] = [
+    {
+      title: intl.formatMessage({
+        id: 'pages.system.example.field.keyword',
+        defaultMessage: 'Keyword',
+      }),
+      dataIndex: 'keyword',
+      hideInTable: true,
+      fieldProps: {
+        allowClear: true,
+        placeholder: intl.formatMessage({
+          id: 'pages.system.example.placeholder.keyword',
+          defaultMessage: 'Name / Code / Owner',
+        }),
+      },
+    },
     {
       title: intl.formatMessage({
         id: 'pages.system.example.field.name',
@@ -42,6 +75,7 @@ const ExampleTable = ({
       }),
       dataIndex: 'name',
       key: 'name',
+      search: false,
     },
     {
       title: intl.formatMessage({
@@ -50,6 +84,7 @@ const ExampleTable = ({
       }),
       dataIndex: 'code',
       key: 'code',
+      search: false,
     },
     {
       title: intl.formatMessage({
@@ -58,8 +93,10 @@ const ExampleTable = ({
       }),
       dataIndex: 'status',
       key: 'status',
-      render: (value: ExampleItem['status']) => (
-        <BizStatusTag value={value} options={statusOptions} />
+      valueType: 'select',
+      valueEnum: statusValueEnum,
+      render: (_, entity) => (
+        <BizStatusTag value={entity.status} options={statusOptions} />
       ),
     },
     {
@@ -69,6 +106,7 @@ const ExampleTable = ({
       }),
       dataIndex: 'owner',
       key: 'owner',
+      search: false,
     },
     {
       title: intl.formatMessage({
@@ -77,6 +115,7 @@ const ExampleTable = ({
       }),
       dataIndex: 'updatedAt',
       key: 'updatedAt',
+      search: false,
     },
     {
       title: intl.formatMessage({
@@ -85,6 +124,7 @@ const ExampleTable = ({
       }),
       key: 'action',
       width: 180,
+      valueType: 'option',
       render: (_, record) => (
         <Space>
           <Button type="link" onClick={() => onView(record)}>
@@ -129,19 +169,35 @@ const ExampleTable = ({
   ];
 
   return (
-    <Table<ExampleItem>
-      columns={columns}
-      dataSource={data?.records}
-      loading={loading}
+    <ProTable<ExampleItem, ExampleTableParams>
+      actionRef={actionRef}
+      headerTitle={intl.formatMessage({
+        id: 'pages.system.example.title',
+        defaultMessage: 'Example Management',
+      })}
       rowKey="id"
+      search={{
+        labelWidth: 100,
+      }}
+      columns={columns}
       pagination={{
-        current: data?.pageNo ?? 1,
-        pageSize: data?.pageSize ?? 10,
-        total: data?.total ?? 0,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
         showSizeChanger: true,
       }}
-      onChange={(pagination) => {
-        onPageChange(pagination.current ?? 1, pagination.pageSize ?? 10);
+      toolBarRender={toolBarRender}
+      request={async (params) => {
+        const result = await queryExampleList({
+          pageNo: params.current ?? 1,
+          pageSize: params.pageSize ?? DEFAULT_PAGE_SIZE,
+          keyword: params.keyword,
+          status: normalizeStatus(params.status),
+        });
+
+        return {
+          data: result.records,
+          total: result.total,
+          success: true,
+        };
       }}
     />
   );

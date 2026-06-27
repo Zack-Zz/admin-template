@@ -11,6 +11,7 @@ This repository is not a concrete business system and not a second display site 
 - ProLayout, login initialization, routes, and access conventions.
 - Umi Max request, error handling, and OpenAPI generated service conventions.
 - A standard CRUD example module for future business pages.
+- Chinese-first business development standards under `docs/`.
 - Lightweight business components for status tags, permission buttons, dictionary selects, detail drawers, form modals, and toolbars.
 - Codex / AI coding agent guardrails to reduce global rewrites and invented backend APIs.
 - A small native Node.js module generator for standard page skeletons.
@@ -64,19 +65,29 @@ src/app.tsx                   Runtime config, initial state, Layout, request
 src/access.ts                 Access convention
 src/components/biz/           Shared business components
 src/pages/system/example/     Standard CRUD example module
-src/services/ant-design-pro/  OpenAPI generated services; do not edit manually
+src/services/openapi/  OpenAPI generated services; do not edit manually
 src/types/                    Shared types and API contract types
 scripts/generate-module.mjs   Module generator
 templates/module/             Module generator templates
 ```
 
+## Documentation
+
+- [Business development standard](./docs/development-standard.md)
+- [Project setup checklist](./docs/project-setup.md)
+- [Module development](./docs/module-development.md)
+- [API contract and adapter boundary](./docs/api-contract.md)
+- [Module review checklist](./docs/checklists/module-review.md)
+- [Codex prompt](./docs/codex-prompt.md)
+
 ## Development Rules
 
 - New admin pages should start from `src/pages/system/example/`.
 - Page modules should keep `index.tsx`, `service.ts`, `types.ts`, `constants.ts`, and `components/` co-located.
-- API calls should use the current Umi request convention, generated services, or page-level `service.ts`.
+- Default CRUD pages should use `PageContainer`, `ProTable`, `ModalForm` / `ProForm`, and `ProDescriptions`.
+- API calls should use the current Umi request convention, generated services, or page-level `service.ts`, then adapt backend responses to project internal types.
 - If an API does not exist, leave a TODO or use a local mock promise. Do not invent real backend URLs.
-- `src/services/ant-design-pro/` is generated code. Update it with `npm run openapi`.
+- `src/services/openapi/` is generated code. Update it with `npm run openapi`.
 - UI priority: existing Umi Max / Ant Design Pro capability -> ProComponents -> Ant Design base components -> thin wrappers in `src/components/biz/`.
 - Do not introduce MUI, Chakra UI, Arco Design, Element, Naive UI, or another UI system.
 - Do not rewrite existing Ant Design / ProComponents foundation features or add a complex low-code CRUD engine.
@@ -84,7 +95,11 @@ templates/module/             Module generator templates
 
 ## Internationalization
 
-The scaffold keeps Umi Max i18n enabled. The default locale is `en-US`; users can switch language from the header language menu. `README.md` is the English entry, and `README.zh-CN.md` is the Simplified Chinese version.
+The scaffold keeps Umi Max i18n enabled and maintains `en-US` and `zh-CN` by default. The default locale is `en-US`; users can switch language from the header language menu. If a business project keeps only one locale, the language switcher is hidden automatically.
+
+## Permissions
+
+The scaffold keeps a lightweight permission convention. Route access uses `config/routes.ts` plus `src/access.ts`; the built-in `canAdmin` rule checks `currentUser.access === 'admin'`. Action permissions can be marked with `BizPermissionButton permissionCode`, using names such as `system:example:create`.
 
 ## Verification
 

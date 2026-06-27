@@ -26,7 +26,7 @@
 - Do not casually modify global Layout, theme, menu style, login flow, or request runtime.
 - Do not rewrite foundation features already provided by Ant Design or ProComponents.
 - Do not write large blocks of custom CSS in business pages.
-- Do not hand-edit `src/services/ant-design-pro/`; regenerate it with `npm run openapi`.
+- Do not hand-edit `src/services/openapi/`; regenerate it with `npm run openapi`.
 - Do not invent backend URLs or fake real API contracts.
 - Do not use `any` just to silence TypeScript. Prefer `unknown`, narrow types, or explicit local interfaces.
 - Do not modify `package-lock.json` unless `package.json` changes require it.
@@ -45,12 +45,15 @@
 ## Page Development
 
 - New admin pages should follow `src/pages/system/example/`.
+- Business project rules live in `docs/development-standard.md`; use it as the source of truth when docs disagree.
 - Keep each module co-located:
   - `index.tsx`
   - `service.ts`
   - `types.ts`
   - `constants.ts`
   - `components/`
+- Default CRUD pages should use `ProTable` built-in search, pagination, toolbar, and request flow.
+- Split a dedicated `SearchForm` only when `ProTable` search cannot express the query experience cleanly.
 - Keep pages visually consistent with Ant Design Pro. Do not design a new visual language for a single page.
 - Prefer Ant Design, ProComponents, and `src/components/biz/` over ad hoc UI.
 - Keep forms, tables, drawers, and modals simple. Do not build a generic low-code CRUD engine.
@@ -66,7 +69,6 @@ src/pages/<group>/<module>/
   types.ts
   constants.ts
   components/
-    <Module>SearchForm.tsx
     <Module>Table.tsx
     <Module>FormModal.tsx
     <Module>DetailDrawer.tsx
@@ -79,8 +81,9 @@ The generator must not modify routes automatically unless the implementation is 
 ## API Rules
 
 - Use Umi Max `request` through generated services or per-page `service.ts`.
-- Keep backend response types aligned with `src/types/api.ts`.
-- Default response envelope:
+- Keep page components aligned with internal types from `src/types/api.ts` and `src/types/common.ts`.
+- Backend wire shapes may differ by project. Normalize them in generated service wrappers, page `service.ts`, or request interceptors before page components consume them.
+- Internal response envelope:
 
 ```ts
 interface ApiResult<T> {
@@ -90,7 +93,7 @@ interface ApiResult<T> {
 }
 ```
 
-- Default pagination envelope:
+- Internal pagination envelope:
 
 ```ts
 interface PageResult<T> {
@@ -103,6 +106,15 @@ interface PageResult<T> {
 
 - If a backend API does not exist, leave a TODO and use a local mock promise only for scaffold examples.
 - Future Authorization and tenant headers belong in request interceptors, not in page components.
+
+## Permission And i18n Rules
+
+- Route access belongs in `config/routes.ts` and `src/access.ts`.
+- The built-in `canAdmin` rule checks `currentUser.access === 'admin'`.
+- Action permission markers belong on `BizPermissionButton permissionCode`.
+- Permission codes should use `<domain>:<module>:<action>`, for example `system:example:create`.
+- Default locales are `en-US` and `zh-CN`; default language is `en-US`.
+- If a business project keeps only one locale, the language switcher should stay hidden.
 
 ## Code Style
 
