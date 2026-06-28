@@ -10,6 +10,24 @@
 - 禁止引入 MUI、Chakra UI、Arco Design、Element、Naive UI 等竞争 UI 体系。
 - 禁止在业务页面中写大段自定义 CSS；优先使用 Ant Design Pro 默认视觉、ProComponents、少量 Tailwind 布局工具和必要的 antd-style。
 
+## Ant Design 生态资源
+
+默认资源是脚手架基础能力，业务项目应优先沿用：
+
+- `antd`：基础 UI 组件。
+- `@ant-design/pro-components`：后台页面、CRUD、表单、详情等高阶组件。
+- Ant Design Pro / Umi Max：项目结构、布局、路由、request、access、locale、OpenAPI 等工程基础。
+- `@ant-design/icons`：业务功能图标默认来源。
+
+推荐资源不默认内置，只有出现明确业务场景时再引入：
+
+- Ant Design Charts：统计分析、仪表盘、报表图表。
+- AntV：复杂数据可视化、关系图、流程图、图形分析。
+- Ant Design X：AI 助手、对话界面、智能体工作台。
+- dumi：业务组件库或设计系统文档站。
+- qiankun：多团队、多子应用微前端集成。
+- Ant Motion：需要体系化动效的页面或组件。
+
 ## 业务模块
 
 普通 CRUD 模块默认参考 `src/pages/system/example/`：
@@ -41,6 +59,7 @@ src/pages/<group>/<module>/
 
 - 后端天然匹配项目标准时，可以直接透传。
 - 后端响应不一致时，在 OpenAPI 生成服务、页面级 `service.ts` 或 `src/requestErrorConfig.ts` 的 response interceptor 中适配。
+- 当前 request runtime 已内置 `code/message/data` 成功解包、业务错误抛出、HTTP/business 401 登录跳转，以及 token/tenant header 注入点。
 - 页面组件只消费项目内部标准类型，不直接耦合不同服务端的原始响应。
 - 不手改 `src/services/openapi/`，需要更新时改 OpenAPI schema 后运行 `npm run openapi`。
 - 不在页面组件里拼 Authorization、tenantId、traceId 等 header；统一放在 request interceptors。
@@ -53,6 +72,7 @@ src/pages/<group>/<module>/
 - 路由级权限使用 `config/routes.ts` 的 `access` 字段，对应 `src/access.ts`。
 - 当前内置 `canAdmin`，来源是 `initialState.currentUser.access === 'admin'`。
 - 按钮或操作权限统一用 `BizPermissionButton permissionCode` 标注。
+- 当权限按钮需要被 `Popconfirm`、`Tooltip` 等组件包裹时，使用 `useBizPermission(permissionCode)` 控制整个交互组件是否渲染。
 - `permissionCode` 建议命名为 `<domain>:<module>:<action>`，例如 `system:example:create`。
 - `BizPermissionButton` 当前支持轻量适配：如果 `currentUser.permissions` 或 `currentUser.permissionCodes` 是字符串数组，则按 `permissionCode` 判断；如果后端尚未提供权限集合，则默认放行。
 - `currentUser.access === 'admin'` 默认拥有所有按钮权限。
@@ -68,6 +88,16 @@ src/pages/<group>/<module>/
 - 如果业务项目只使用中文，可以只保留 `zh-CN` 并把默认语言改为 `zh-CN`；当可用语言只有一套时，语言切换入口会自动隐藏。
 - 新业务代码默认使用 `useIntl().formatMessage({ id, defaultMessage })`，至少维护 `en-US` 和 `zh-CN` 两套文案。
 - 模块生成器会输出页面 locale key 清单；生成新模块后必须补充 `src/locales/en-US/pages.ts`、`src/locales/zh-CN/pages.ts` 和对应 `menu.*` key。
+
+## 图标与品牌资源
+
+- 业务功能图标默认使用 `@ant-design/icons`，例如按钮、表单、操作入口、右上角工具和页面局部状态图标。
+- 写 Ant Design 图标前先确认图标名存在；不凭记忆随意写不存在的 icon import。
+- 菜单图标优先使用 `config/routes.ts` 的 `icon` 字段和 ProLayout 现有机制；页面内部图标使用显式 import。
+- 系统品牌 Logo 不使用 Ant Design Pro 默认 Logo，不使用 Ant Design 官方品牌图形冒充业务品牌。
+- 当前应用内 Logo 入口是 `src/assets/logo.svg`，Layout 和登录页应优先引用它；`public/logo.svg`、`public/pro_icon.svg`、`public/favicon.ico`、`public/icons/*` 作为静态/PWA 品牌资源同步维护。
+- 不默认接入 iconfont.cn、自定义企业图标库或 SVGR React Component 配置；只有业务项目确实需要时再引入，并在交付说明里解释原因。
+- 不在页面里内联大段 SVG。少量业务专属 SVG 应放入明确的 assets 目录，并说明用途。
 
 ## 代码质量
 

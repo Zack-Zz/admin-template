@@ -46,6 +46,19 @@ src/pages/system/organization/
 The generator does not edit routes automatically. Add the route manually in `config/routes.ts` after reviewing the target menu group.
 It also prints the page and menu locale keys that must be added to `src/locales/en-US/` and `src/locales/zh-CN/`.
 
+Before writing files, use dry-run to review the planned route and locale keys:
+
+```bash
+npm run gen:module -- --name audit-log --group system --title 审计日志 --title-en "Audit Log" --dry-run
+```
+
+After generation:
+
+- Review `config/routes.ts` and add the route manually.
+- Add all printed `en-US` and `zh-CN` locale keys.
+- Review generated `permissionCode` values before connecting real RBAC.
+- Run `npm run lint`, `npx antd lint ./src --format json`, and `npm run test`.
+
 ## Route Example
 
 ```ts

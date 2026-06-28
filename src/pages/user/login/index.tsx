@@ -15,6 +15,7 @@ import {
 import { Alert, App, Button, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { startTransition, useState } from 'react';
+import logoUrl from '@/assets/logo.svg';
 import { Footer } from '@/components';
 import { getFakeCaptcha, login } from '@/services/openapi/login';
 import Settings from '../../../../config/defaultSettings';
@@ -158,7 +159,7 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
+          logo={<img alt="Admin Template logo" src={logoUrl} />}
           title="Admin Template"
           subTitle={intl.formatMessage({
             id: 'pages.layouts.userLayout.title',

@@ -5,15 +5,34 @@
 ## 基础信息
 
 - 修改 `package.json` 中的项目名、描述和仓库地址。
-- 替换 `public/logo.svg`、`public/pro_icon.svg`、`src/manifest.json` 中的品牌信息。
+- 替换 `src/assets/logo.svg`，并同步 `public/logo.svg`、`public/pro_icon.svg`、`public/favicon.ico`、`public/icons/*`、`src/manifest.json` 中的品牌信息。
 - 检查 `config/defaultSettings.ts`，确认系统名称、主题和布局配置。
 - 根据业务需要调整 `src/pages/Welcome.tsx` 或默认首页路由。
+
+## 图标与品牌
+
+- 功能图标优先从 `@ant-design/icons` 选择，不新增图标库。
+- 菜单图标优先使用 `config/routes.ts` 的 `icon` 字段；页面按钮和操作图标使用显式 import。
+- 不使用 Ant Design Pro 默认 Logo 或 Ant Design 官方品牌图形作为业务系统 Logo。
+- 企业自有 iconfont、自定义图标包或 SVGR 配置仅在业务项目明确需要时引入。
+- `src/assets/logo.svg` 是运行时 Layout 和登录页的主 Logo；替换品牌时先改它。
+- `public/logo.svg` 可作为静态 fallback，与 `src/assets/logo.svg` 保持同品牌。
+- `public/favicon.ico`、`public/pro_icon.svg`、`public/icons/*`、`src/manifest.json` 是浏览器/PWA 资产，发布前必须与主 Logo 和系统名称一致。
+
+## 按需推荐资源
+
+- 统计分析、仪表盘、报表图表：优先评估 Ant Design Charts。
+- 复杂可视化、关系图、流程图、图形分析：优先评估 AntV。
+- AI 助手、对话界面、智能体工作台：优先评估 Ant Design X。
+- 业务组件库或设计系统文档站：优先评估 dumi。
+- 多团队、多子应用集成：优先评估 qiankun。
+- 体系化动效：优先评估 Ant Motion。
 
 ## 路由与菜单
 
 - 在 `config/routes.ts` 中保留需要的菜单组，删除或隐藏不需要的示例页面。
 - 新业务模块使用 `npm run gen:module -- --name <module> --group <group> --title <中文标题> --title-en <English Title>` 生成，再手动添加路由。
-- 生成器会打印 route snippet、`menu.*` key 和页面 locale key；接入模块时必须补齐 `en-US` / `zh-CN` 文案。
+- 生成器会打印 route snippet、`menu.*` key、页面 locale key 和生成后 checklist；接入模块时必须补齐 `en-US` / `zh-CN` 文案。
 - 路由 `name` 应能对应 locale 中的 `menu.xxx` 文案。
 - 需要路由权限时，使用 `access` 字段并在 `src/access.ts` 中集中定义。
 

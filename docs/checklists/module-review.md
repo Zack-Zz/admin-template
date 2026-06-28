@@ -17,6 +17,7 @@
 - 新增/编辑使用 `ModalForm`、`DrawerForm` 或 `ProForm`。
 - 详情使用 `ProDescriptions`。
 - `src/components/biz/` 只作为薄封装，没有替代 ProComponents。
+- 业务功能图标来自 `@ant-design/icons`，没有新增图标库、内联大段 SVG 或误用品牌 Logo。
 - 没有大段页面级 CSS，没有引入新的 UI 体系。
 
 ## 数据与类型

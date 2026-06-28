@@ -42,6 +42,34 @@
 4. Use `src/components/biz/` only for project-level business conveniences.
 5. Keep business components as thin wrappers around Ant Design or ProComponents. They must not become a separate design system, schema renderer, or low-code CRUD engine.
 
+## Ant Design Ecosystem Resources
+
+Default resources for this scaffold:
+
+- `antd` for base UI components.
+- `@ant-design/pro-components` for admin surfaces, CRUD, forms, and details.
+- Ant Design Pro / Umi Max for layout, routing, request, access, locale, OpenAPI, and project structure.
+- `@ant-design/icons` for product icons.
+
+Recommended resources only when a concrete business scenario requires them:
+
+- Ant Design Charts for dashboards, analytics, and reports.
+- AntV for complex visualization, graph, flow, and visual analysis needs.
+- Ant Design X for AI assistant, chat, and agent workspace experiences.
+- dumi for business component library or design-system documentation.
+- qiankun for micro-frontend integration across multiple applications or teams.
+- Ant Motion for systematic motion design.
+
+## Icon And Brand Asset Rules
+
+- Use `@ant-design/icons` for normal product icons such as buttons, actions, form hints, header tools, and local page states.
+- Verify an icon exists before importing it; do not guess icon names from memory.
+- Use `config/routes.ts` `icon` fields for menu icons when ProLayout can render them cleanly; use explicit `@ant-design/icons` imports inside pages and components.
+- Do not use Ant Design Pro's default logo or Ant Design's official brand marks as the business system logo.
+- The application logo source is `src/assets/logo.svg`; keep `public/logo.svg`, `public/pro_icon.svg`, `public/favicon.ico`, and `public/icons/*` in sync for static and PWA branding.
+- Do not add iconfont.cn, custom enterprise icon packages, or SVGR React-component config by default. Add them only for a concrete business need and document why.
+- Do not inline large SVG blocks in page components. Put business-specific SVG files under an assets directory with a clear purpose.
+
 ## Page Development
 
 - New admin pages should follow `src/pages/system/example/`.

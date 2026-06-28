@@ -210,6 +210,12 @@ const main = () => {
   for (const [key, , zhValue] of localeEntries) {
     console.log(`'${i18nPrefix}.${key}': '${escapeLocaleValue(zhValue)}',`);
   }
+  console.log('');
+  console.log('After generation checklist:');
+  console.log('- Review config/routes.ts and add the route manually.');
+  console.log('- Add all printed en-US and zh-CN locale keys.');
+  console.log('- Review permissionCode values before connecting real RBAC.');
+  console.log('- Run npm run lint, npx antd lint ./src --format json, and npm run test.');
 };
 
 try {

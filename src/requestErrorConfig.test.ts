@@ -1,14 +1,25 @@
+import { history } from '@umijs/max';
 import { message, notification } from 'antd';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { errorConfig } from './requestErrorConfig';
+import {
+  AUTH_TOKEN_STORAGE_KEY,
+  errorConfig,
+  TENANT_ID_STORAGE_KEY,
+} from './requestErrorConfig';
+
+type TestBizErrorInfo = {
+  code?: number | string;
+  message?: string;
+  showType?: number;
+  data?: unknown;
+};
+
+type TestBizError = Error & {
+  name: 'BizError';
+  info: TestBizErrorInfo;
+};
 
 type TestResponseError = Error & {
-  info?: {
-    errorCode?: number;
-    errorMessage?: string;
-    showType?: number;
-    data?: unknown;
-  };
   response?: {
     status: number;
     data?: unknown;
@@ -16,11 +27,21 @@ type TestResponseError = Error & {
   request?: unknown;
 };
 
+type TestRequestConfig = {
+  url?: string;
+  method?: string;
+  headers?: Record<string, unknown>;
+};
+
+type TestResponse = {
+  data?: unknown;
+};
+
 const createBizError = (
   messageText: string,
-  info: TestResponseError['info'],
-): TestResponseError => {
-  const error = new Error(messageText) as TestResponseError;
+  info: TestBizErrorInfo,
+): TestBizError => {
+  const error = new Error(messageText) as TestBizError;
   error.name = 'BizError';
   error.info = info;
   return error;
@@ -40,6 +61,14 @@ vi.mock('@umijs/max', () => ({
   getIntl: vi.fn(() => ({
     formatMessage: vi.fn(({ defaultMessage }) => defaultMessage),
   })),
+  history: {
+    location: {
+      pathname: '/secure',
+      search: '?tab=list',
+      hash: '#top',
+    },
+    replace: vi.fn(),
+  },
 }));
 
 describe('requestErrorConfig', () => {
@@ -47,74 +76,81 @@ describe('requestErrorConfig', () => {
   const errorThrower = errorConfig.errorConfig!.errorThrower!;
   // biome-ignore lint/style/noNonNullAssertion: config handlers are always defined
   const errorHandler = errorConfig.errorConfig!.errorHandler!;
+  const requestInterceptor = errorConfig.requestInterceptors?.[0] as (
+    config: TestRequestConfig,
+  ) => TestRequestConfig;
+  const responseInterceptor = errorConfig
+    .responseInterceptors?.[0] as unknown as (
+    response: TestResponse,
+  ) => TestResponse;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
+    history.location.pathname = '/secure';
+    history.location.search = '?tab=list';
+    history.location.hash = '#top';
   });
 
   describe('errorThrower', () => {
-    it('should throw error when success is false', () => {
-      const response = {
-        success: false,
-        data: null,
-        errorCode: 400,
-        errorMessage: 'Bad Request',
-        showType: 2,
-      };
+    it('does not throw for ApiResult success codes', () => {
+      expect(() => {
+        errorThrower({ code: 0, message: 'ok', data: { id: 1 } });
+      }).not.toThrow();
 
       expect(() => {
-        errorThrower(response);
-      }).toThrow('Bad Request');
-    });
-
-    it('should not throw error when success is true', () => {
-      const response = {
-        success: true,
-        data: { id: 1 },
-      };
-
-      expect(() => {
-        errorThrower(response);
+        errorThrower({ code: '200', message: 'ok', data: { id: 2 } });
       }).not.toThrow();
     });
 
-    it('should throw BizError with correct info', () => {
-      const response = {
-        success: false,
-        data: { detail: 'more info' },
-        errorCode: 403,
-        errorMessage: 'Forbidden',
-        showType: 3,
-      };
+    it('throws BizError for ApiResult business errors', () => {
+      expect.assertions(4);
 
-      expect.assertions(5);
       try {
-        errorThrower(response);
+        errorThrower({
+          code: 40001,
+          message: 'Invalid business state',
+          data: { field: 'status' },
+        });
       } catch (error) {
-        const bizError = error as TestResponseError;
+        const bizError = error as TestBizError;
         expect(bizError.name).toBe('BizError');
-        expect(bizError.info?.errorCode).toBe(403);
-        expect(bizError.info?.errorMessage).toBe('Forbidden');
-        expect(bizError.info?.showType).toBe(3);
-        expect(bizError.info?.data).toEqual({ detail: 'more info' });
+        expect(bizError.info.code).toBe(40001);
+        expect(bizError.info.message).toBe('Invalid business state');
+        expect(bizError.info.data).toEqual({ field: 'status' });
       }
+    });
+
+    it('keeps compatibility with legacy Pro success responses', () => {
+      expect(() => {
+        errorThrower({ success: true, data: { id: 1 } });
+      }).not.toThrow();
+
+      expect(() => {
+        errorThrower({
+          success: false,
+          data: null,
+          errorCode: 403,
+          errorMessage: 'Forbidden',
+          showType: 2,
+        });
+      }).toThrow('Forbidden');
     });
   });
 
   describe('errorHandler', () => {
-    it('should rethrow error when skipErrorHandler is true', () => {
+    it('rethrows error when skipErrorHandler is true', () => {
       const error = new Error('Test error');
-      const opts = { skipErrorHandler: true };
 
       expect(() => {
-        errorHandler(error, opts);
+        errorHandler(error, { skipErrorHandler: true });
       }).toThrow('Test error');
     });
 
-    it('should handle SILENT showType', () => {
+    it('handles SILENT showType', () => {
       const error = createBizError('Silent error', {
-        errorCode: 1001,
-        errorMessage: 'Silent error',
+        code: 1001,
+        message: 'Silent error',
         showType: 0,
       });
 
@@ -125,10 +161,10 @@ describe('requestErrorConfig', () => {
       expect(notification.open).not.toHaveBeenCalled();
     });
 
-    it('should handle WARN_MESSAGE showType', () => {
+    it('handles WARN_MESSAGE showType', () => {
       const error = createBizError('Warning', {
-        errorCode: 1002,
-        errorMessage: 'This is a warning',
+        code: 1002,
+        message: 'This is a warning',
         showType: 1,
       });
 
@@ -137,10 +173,10 @@ describe('requestErrorConfig', () => {
       expect(message.warning).toHaveBeenCalledWith('This is a warning');
     });
 
-    it('should handle ERROR_MESSAGE showType', () => {
+    it('handles ERROR_MESSAGE showType', () => {
       const error = createBizError('Error message', {
-        errorCode: 1003,
-        errorMessage: 'This is an error',
+        code: 1003,
+        message: 'This is an error',
         showType: 2,
       });
 
@@ -149,10 +185,10 @@ describe('requestErrorConfig', () => {
       expect(message.error).toHaveBeenCalledWith('This is an error');
     });
 
-    it('should handle NOTIFICATION showType', () => {
+    it('handles NOTIFICATION showType', () => {
       const error = createBizError('Notification', {
-        errorCode: 1004,
-        errorMessage: 'This is a notification',
+        code: 1004,
+        message: 'This is a notification',
         showType: 3,
       });
 
@@ -164,25 +200,39 @@ describe('requestErrorConfig', () => {
       });
     });
 
-    it('should handle REDIRECT showType', () => {
-      const error = createBizError('Redirect', {
-        errorCode: 401,
-        errorMessage: 'Unauthorized',
-        showType: 9,
+    it('redirects 401 business errors to login', () => {
+      const error = createBizError('Unauthorized', {
+        code: 401,
+        message: 'Unauthorized',
       });
 
       errorHandler(error, {});
 
-      // REDIRECT 分支不应触发任何消息/通知提示
-      expect(message.warning).not.toHaveBeenCalled();
+      expect(history.replace).toHaveBeenCalledWith(
+        '/user/login?redirect=%2Fsecure%3Ftab%3Dlist%23top',
+      );
       expect(message.error).not.toHaveBeenCalled();
-      expect(notification.open).not.toHaveBeenCalled();
     });
 
-    it('should handle default case for unknown showType', () => {
+    it('redirects HTTP 401 response errors to login', () => {
+      const error = new Error('Axios error') as TestResponseError;
+      error.response = {
+        status: 401,
+        data: {},
+      };
+
+      errorHandler(error, {});
+
+      expect(history.replace).toHaveBeenCalledWith(
+        '/user/login?redirect=%2Fsecure%3Ftab%3Dlist%23top',
+      );
+      expect(message.error).not.toHaveBeenCalled();
+    });
+
+    it('handles default case for unknown showType', () => {
       const error = createBizError('Unknown type', {
-        errorCode: 1005,
-        errorMessage: 'Unknown error type',
+        code: 1005,
+        message: 'Unknown error type',
         showType: 99,
       });
 
@@ -191,7 +241,7 @@ describe('requestErrorConfig', () => {
       expect(message.error).toHaveBeenCalledWith('Unknown error type');
     });
 
-    it('should handle axios response error', () => {
+    it('handles axios response error', () => {
       const error = new Error('Axios error') as TestResponseError;
       error.response = {
         status: 500,
@@ -203,7 +253,7 @@ describe('requestErrorConfig', () => {
       expect(message.error).toHaveBeenCalledWith('Response status:500');
     });
 
-    it('should handle offline error', () => {
+    it('handles offline error', () => {
       const error = new Error('Network error') as TestResponseError;
       error.request = {};
 
@@ -227,7 +277,7 @@ describe('requestErrorConfig', () => {
       }
     });
 
-    it('should handle request error with no response', () => {
+    it('handles request error with no response', () => {
       const error = new Error('Request error') as TestResponseError;
       error.request = {};
 
@@ -238,7 +288,7 @@ describe('requestErrorConfig', () => {
       );
     });
 
-    it('should handle generic error', () => {
+    it('handles generic error', () => {
       const error = new Error('Generic error');
 
       errorHandler(error, {});
@@ -250,32 +300,62 @@ describe('requestErrorConfig', () => {
   });
 
   describe('requestInterceptors', () => {
-    // The interceptor is registered as a plain function (not a tuple),
-    // so narrow the union type to a callable for the test.
-    const interceptor = errorConfig.requestInterceptors?.[0] as (config: {
-      url?: string;
-      method?: string;
-    }) => { url?: string };
+    it('attaches auth token and tenant headers when available', () => {
+      localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, 'token-123');
+      localStorage.setItem(TENANT_ID_STORAGE_KEY, 'tenant-a');
 
-    it('should pass through config without modification', () => {
+      const result = requestInterceptor({
+        url: '/request-test/users',
+        method: 'GET',
+      });
+
+      expect(result.headers).toMatchObject({
+        Authorization: 'Bearer token-123',
+        'X-Tenant-Id': 'tenant-a',
+      });
+    });
+
+    it('keeps config unchanged when token and tenant are missing', () => {
       const config = {
         url: '/request-test/users',
         method: 'GET',
       };
 
-      const result = interceptor(config);
+      const result = requestInterceptor(config);
 
-      // Token attachment is intentionally commented out in the source;
-      // interceptor currently returns config as-is
-      expect(result.url).toBe('/request-test/users');
+      expect(result).toBe(config);
+      expect(result.headers).toBeUndefined();
+    });
+  });
+
+  describe('responseInterceptors', () => {
+    it('unwraps successful ApiResult responses', () => {
+      const result = responseInterceptor({
+        data: {
+          code: 0,
+          message: 'ok',
+          data: { id: 1 },
+        },
+      });
+
+      expect(result.data).toEqual({ id: 1 });
     });
 
-    it('should handle URL without config', () => {
-      const config = {};
+    it('passes through non-ApiResult responses', () => {
+      const response = {
+        data: {
+          success: true,
+          data: { id: 1 },
+        },
+      };
 
-      const result = interceptor(config);
+      const result = responseInterceptor(response);
 
-      expect(result.url).toBeUndefined();
+      expect(result).toBe(response);
+      expect(result.data).toEqual({
+        success: true,
+        data: { id: 1 },
+      });
     });
   });
 });

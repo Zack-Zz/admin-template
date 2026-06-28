@@ -1,16 +1,12 @@
 import { useModel } from '@umijs/max';
 import type { ButtonProps } from 'antd';
 import { Button } from 'antd';
+import type { PermissionCurrentUser } from '@/types';
 
 export interface BizPermissionButtonProps extends ButtonProps {
   permissionCode?: string;
   hiddenWhenDenied?: boolean;
 }
-
-type CurrentUserWithPermissionCodes = API.CurrentUser & {
-  permissions?: unknown;
-  permissionCodes?: unknown;
-};
 
 const getStringList = (value: unknown) => {
   if (!Array.isArray(value)) {
@@ -20,12 +16,30 @@ const getStringList = (value: unknown) => {
   return value.filter((item): item is string => typeof item === 'string');
 };
 
-const getPermissionCodes = (currentUser?: API.CurrentUser) => {
-  const user = currentUser as CurrentUserWithPermissionCodes | undefined;
+export const getPermissionCodes = (currentUser?: PermissionCurrentUser) => {
+  return (
+    getStringList(currentUser?.permissions) ??
+    getStringList(currentUser?.permissionCodes)
+  );
+};
+
+export const checkPermission = (
+  currentUser: PermissionCurrentUser | undefined,
+  permissionCode: string | undefined,
+) => {
+  const permissionCodes = getPermissionCodes(currentUser);
 
   return (
-    getStringList(user?.permissions) ?? getStringList(user?.permissionCodes)
+    !permissionCode ||
+    currentUser?.access === 'admin' ||
+    !permissionCodes ||
+    permissionCodes.includes(permissionCode)
   );
+};
+
+export const useBizPermission = (permissionCode?: string) => {
+  const { initialState } = useModel('@@initialState');
+  return checkPermission(initialState?.currentUser, permissionCode);
 };
 
 const BizPermissionButton = ({
@@ -33,14 +47,7 @@ const BizPermissionButton = ({
   hiddenWhenDenied = false,
   ...buttonProps
 }: BizPermissionButtonProps) => {
-  const { initialState } = useModel('@@initialState');
-  const currentUser = initialState?.currentUser;
-  const permissionCodes = getPermissionCodes(currentUser);
-  const allowed =
-    !permissionCode ||
-    currentUser?.access === 'admin' ||
-    !permissionCodes ||
-    permissionCodes.includes(permissionCode);
+  const allowed = useBizPermission(permissionCode);
 
   if (!allowed && hiddenWhenDenied) {
     return null;

@@ -68,6 +68,14 @@ Always prefer `--format json` so Codex can read structured output.
 - Keep business wrappers in `src/components/biz/` thin. They must not become a schema renderer, design system, or low-code CRUD engine.
 - Do not hand-edit `src/services/openapi/`.
 - Do not invent backend URLs while wiring antd tables/forms. Use existing generated services, page `service.ts`, or a clearly local mock promise with TODO.
+- Use `@ant-design/icons` for product icons and verify icon names before importing. Do not add iconfont, custom icon packages, or SVGR config unless the business need is explicit.
+- Keep brand logos separate from product icons. Use `src/assets/logo.svg` for the application logo and keep public/PWA brand assets in sync.
+
+## Ecosystem Resource Policy
+
+Default resources are `antd`, `@ant-design/pro-components`, Ant Design Pro / Umi Max, and `@ant-design/icons`.
+
+Recommend these only for matching business scenarios: Ant Design Charts for charts and reports, AntV for complex visualization, Ant Design X for AI/chat workspaces, dumi for component-library docs, qiankun for micro-frontends, and Ant Motion for systematic motion.
 
 ## Decision Guide
 
@@ -76,6 +84,7 @@ Always prefer `--format json` so Codex can read structured output.
 - Create/edit form in modal or drawer: prefer `ModalForm`, `DrawerForm`, `ProForm`.
 - Read-only detail: prefer `ProDescriptions` or existing `BizDetailDrawer`.
 - Local composition: use antd `Form`, `Table`, `Modal`, `Drawer`, `Descriptions`, `Select`, `Tag`, `Button`, `Space`, `Popconfirm`, `Card`.
+- Product icons: use named imports from `@ant-design/icons`.
 - Styling/theming: use Ant Design tokens and `createStyles`; use Tailwind only for simple layout utilities.
 
 ## Debugging

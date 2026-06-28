@@ -5,7 +5,12 @@ export { default as BizDictSelect } from './BizDictSelect';
 export type { BizFormModalProps } from './BizFormModal';
 export { default as BizFormModal } from './BizFormModal';
 export type { BizPermissionButtonProps } from './BizPermissionButton';
-export { default as BizPermissionButton } from './BizPermissionButton';
+export {
+  checkPermission,
+  default as BizPermissionButton,
+  getPermissionCodes,
+  useBizPermission,
+} from './BizPermissionButton';
 export type {
   BizStatusOption,
   BizStatusTagProps,

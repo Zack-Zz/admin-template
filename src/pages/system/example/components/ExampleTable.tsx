@@ -1,9 +1,13 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Popconfirm, Space } from 'antd';
+import { Button, Popconfirm, Space } from 'antd';
 import type { ReactNode, RefObject } from 'react';
-import { BizPermissionButton, BizStatusTag } from '@/components';
+import {
+  BizPermissionButton,
+  BizStatusTag,
+  useBizPermission,
+} from '@/components';
 import { DEFAULT_PAGE_SIZE, EXAMPLE_STATUS_TAG_OPTIONS } from '../constants';
 import { queryExampleList } from '../service';
 import type { ExampleItem, ExampleQuery, ExampleStatus } from '../types';
@@ -29,6 +33,7 @@ const ExampleTable = ({
   onDelete,
 }: ExampleTableProps) => {
   const intl = useIntl();
+  const canDelete = useBizPermission('system:example:delete');
   const statusOptions = EXAMPLE_STATUS_TAG_OPTIONS.map((item) => ({
     ...item,
     label: intl.formatMessage({
@@ -149,35 +154,32 @@ const ExampleTable = ({
               defaultMessage: 'Edit',
             })}
           </BizPermissionButton>
-          <Popconfirm
-            title={intl.formatMessage({
-              id: 'pages.system.example.delete.title',
-              defaultMessage: 'Delete this example data?',
-            })}
-            description={intl.formatMessage({
-              id: 'pages.system.example.delete.description',
-              defaultMessage:
-                'This only affects the local scaffold example data.',
-            })}
-            okText={intl.formatMessage({
-              id: 'pages.system.example.action.delete',
-              defaultMessage: 'Delete',
-            })}
-            okButtonProps={{ danger: true }}
-            onConfirm={() => onDelete(record)}
-          >
-            <BizPermissionButton
-              danger
-              hiddenWhenDenied
-              permissionCode="system:example:delete"
-              type="link"
-            >
-              {intl.formatMessage({
+          {canDelete && (
+            <Popconfirm
+              title={intl.formatMessage({
+                id: 'pages.system.example.delete.title',
+                defaultMessage: 'Delete this example data?',
+              })}
+              description={intl.formatMessage({
+                id: 'pages.system.example.delete.description',
+                defaultMessage:
+                  'This only affects the local scaffold example data.',
+              })}
+              okText={intl.formatMessage({
                 id: 'pages.system.example.action.delete',
                 defaultMessage: 'Delete',
               })}
-            </BizPermissionButton>
-          </Popconfirm>
+              okButtonProps={{ danger: true }}
+              onConfirm={() => onDelete(record)}
+            >
+              <Button danger type="link">
+                {intl.formatMessage({
+                  id: 'pages.system.example.action.delete',
+                  defaultMessage: 'Delete',
+                })}
+              </Button>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },

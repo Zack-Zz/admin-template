@@ -1,9 +1,12 @@
-﻿import type { RequestOptions } from '@@/plugin-request/request';
+import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { getIntl } from '@umijs/max';
+import { getIntl, history } from '@umijs/max';
 import { message, notification } from 'antd';
 
-// 错误处理方案： 错误类型
+export const AUTH_TOKEN_STORAGE_KEY = 'admin-template:token';
+export const TENANT_ID_STORAGE_KEY = 'admin-template:tenant-id';
+const LOGIN_PATH = '/user/login';
+
 enum ErrorShowType {
   SILENT = 0,
   WARN_MESSAGE = 1,
@@ -11,25 +14,37 @@ enum ErrorShowType {
   NOTIFICATION = 3,
   REDIRECT = 9,
 }
-// 与后端约定的响应数据格式
-interface ResponseStructure {
-  success: boolean;
+
+interface ApiResponseStructure {
+  code: number | string;
+  message?: string;
+  data?: unknown;
+}
+
+interface LegacyResponseStructure {
+  success?: boolean;
   data: unknown;
-  errorCode?: number;
+  errorCode?: number | string;
   errorMessage?: string;
   showType?: ErrorShowType;
 }
 
-type ResponseErrorInfo = Omit<ResponseStructure, 'success'>;
+interface BizErrorInfo {
+  code?: number | string;
+  message?: string;
+  data?: unknown;
+  showType?: ErrorShowType;
+}
 
 type BizError = Error & {
   name: 'BizError';
-  info: ResponseErrorInfo;
+  info: BizErrorInfo;
 };
 
 type ResponseError = Error & {
   response: {
     status?: number;
+    data?: unknown;
   };
 };
 
@@ -52,34 +67,121 @@ const hasResponse = (error: unknown): error is ResponseError =>
 const hasRequest = (error: unknown): error is RequestError =>
   error instanceof Error && isRecord(error) && 'request' in error;
 
+const hasApiResponseShape = (value: unknown): value is ApiResponseStructure =>
+  isRecord(value) && 'code' in value;
+
+const hasLegacyResponseShape = (
+  value: unknown,
+): value is LegacyResponseStructure =>
+  isRecord(value) && typeof value.success === 'boolean';
+
+const isSuccessCode = (code: number | string) =>
+  code === 0 || code === 200 || code === '0' || code === '200';
+
+const getErrorMessage = (value: unknown, fallback: string) =>
+  typeof value === 'string' && value ? value : fallback;
+
+const createBizError = (info: BizErrorInfo) => {
+  const error = new Error(
+    getErrorMessage(info.message, 'Business request failed.'),
+  ) as BizError;
+  error.name = 'BizError';
+  error.info = info;
+  return error;
+};
+
+const redirectToLogin = () => {
+  const { pathname, search, hash } = history.location;
+  if (pathname === LOGIN_PATH) {
+    return;
+  }
+
+  history.replace(
+    `${LOGIN_PATH}?redirect=${encodeURIComponent(pathname + search + hash)}`,
+  );
+};
+
+const getStorageValue = (key: string) => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  try {
+    return window.localStorage.getItem(key) ?? undefined;
+  } catch (_error) {
+    return undefined;
+  }
+};
+
+const appendHeader = (
+  config: RequestOptions,
+  name: string,
+  value: string | undefined,
+) => {
+  if (!value) {
+    return;
+  }
+
+  const headers = isRecord(config.headers) ? config.headers : {};
+  config.headers = {
+    ...headers,
+    [name]: value,
+  };
+};
+
+const unwrapApiResultResponse = <T extends { data?: unknown }>(response: T) => {
+  if (hasApiResponseShape(response.data) && isSuccessCode(response.data.code)) {
+    response.data = response.data.data;
+  }
+
+  return response;
+};
+
 /**
  * @name 错误处理
- * pro 自带的错误处理， 可以在这里做自己的改动
+ * 默认面向 Java REST API 常见的 `code/message/data` 响应格式。
+ * 当前 mock 或旧 Pro 示例的 `success/errorCode/errorMessage` 结构继续兼容。
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const errorConfig: RequestConfig = {
-  // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
-    // 错误抛出
     errorThrower: (res) => {
-      const { success, data, errorCode, errorMessage, showType } =
-        res as unknown as ResponseStructure;
-      if (!success) {
-        const error = new Error(errorMessage) as BizError;
-        error.name = 'BizError';
-        error.info = { errorCode, errorMessage, showType, data };
-        throw error; // 抛出自制的错误
+      if (hasApiResponseShape(res) && !isSuccessCode(res.code)) {
+        throw createBizError({
+          code: res.code,
+          message: getErrorMessage(res.message, 'Business request failed.'),
+          data: res.data,
+        });
+      }
+
+      if (hasLegacyResponseShape(res) && !res.success) {
+        throw createBizError({
+          code: res.errorCode,
+          message: getErrorMessage(
+            res.errorMessage,
+            'Business request failed.',
+          ),
+          showType: res.showType,
+          data: res.data,
+        });
       }
     },
-    // 错误接收及处理
     errorHandler: (error: unknown, opts?: RequestOptions) => {
       if (opts?.skipErrorHandler) throw error;
-      // 我们的 errorThrower 抛出的错误。
+
       if (isBizError(error)) {
-        const { errorMessage, errorCode } = error.info;
+        const { code } = error.info;
+        const errorMessage = getErrorMessage(
+          error.info.message,
+          error.message || 'Business request failed.',
+        );
+        if (code === 401 || code === '401') {
+          redirectToLogin();
+          return;
+        }
+
         switch (error.info.showType) {
           case ErrorShowType.SILENT:
-            // do nothing
             break;
           case ErrorShowType.WARN_MESSAGE:
             message.warning(errorMessage);
@@ -89,19 +191,22 @@ export const errorConfig: RequestConfig = {
             break;
           case ErrorShowType.NOTIFICATION:
             notification.open({
-              title: errorCode,
+              title: code ?? 'Business Error',
               description: errorMessage,
             });
             break;
           case ErrorShowType.REDIRECT:
-            window.location.href = '/user/login';
+            redirectToLogin();
             break;
           default:
             message.error(errorMessage);
         }
       } else if (hasResponse(error)) {
-        // Axios 的错误
-        // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+        if (error.response.status === 401) {
+          redirectToLogin();
+          return;
+        }
+
         message.error(`Response status:${error.response.status}`);
       } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
         message.error(
@@ -122,16 +227,20 @@ export const errorConfig: RequestConfig = {
   // 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
-      // 拦截请求配置，进行个性化处理。
-      // 示例：为请求附加 token（按需启用）
-      // const token = localStorage.getItem('token');
-      // if (token) {
-      //   config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
-      // }
+      const token = getStorageValue(AUTH_TOKEN_STORAGE_KEY);
+      appendHeader(
+        config,
+        'Authorization',
+        token ? `Bearer ${token}` : undefined,
+      );
+      appendHeader(
+        config,
+        'X-Tenant-Id',
+        getStorageValue(TENANT_ID_STORAGE_KEY),
+      );
       return config;
     },
   ],
 
-  // 响应拦截器
-  responseInterceptors: [],
+  responseInterceptors: [unwrapApiResultResponse],
 };

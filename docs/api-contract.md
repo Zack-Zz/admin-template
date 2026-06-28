@@ -53,31 +53,43 @@ The project keeps the Umi Max request runtime:
 
 Do not add a competing global request wrapper unless there is a concrete need. Page services should use generated OpenAPI services or Umi Max `request`, then normalize responses to project internal types.
 
+Current runtime behavior:
+
+- `code` values `0` / `200` / `'0'` / `'200'` are treated as success.
+- Successful `ApiResult<T>` responses are unwrapped by the response interceptor, so page services can consume `T`.
+- Non-success `ApiResult<T>` responses are thrown as `BizError`.
+- HTTP `401` and business `code: 401` redirect to `/user/login?redirect=...`.
+- The old Ant Design Pro `success/errorCode/errorMessage/showType` response shape remains compatible for existing mock/demo code.
+
 ## Error Handling
 
-The current template still contains Ant Design Pro's `success/errorCode/errorMessage/showType` error handler. When a backend is connected, align one of these approaches:
+Default business errors use the internal `code/message/data` contract. If a real backend returns another wire shape, adapt it before page components consume it:
 
-- Convert backend responses to the current success-based error handler in a response interceptor.
-- Or update `ResponseStructure` and `errorThrower` to use `code`, `message`, and `data`.
+- Prefer request response interceptor for global envelope differences.
+- Use generated OpenAPI service adapters when the difference belongs to a service group.
+- Use page-level `service.ts` mapping only for module-specific DTO differences.
 
-Do this only when a real backend contract exists.
+Do not make page components branch on multiple backend response shapes.
 
 ## Login Expiration
 
-The existing runtime redirects unauthenticated users to `/user/login` from `getInitialState()` and `onPageChange`. Future backend integration should map 401 responses to the same login route and preserve the current redirect query behavior.
+The runtime redirects unauthenticated users to `/user/login` from `getInitialState()` and `onPageChange`. Request errors with HTTP `401` or business `code: 401` use the same login route and preserve the current redirect query behavior.
 
 ## Authorization And Tenant Headers
 
-Future integration point:
+`src/requestErrorConfig.ts` currently reads these browser storage keys:
 
 ```ts
-// src/requestErrorConfig.ts
-// TODO: attach Authorization and tenantId after the auth model is finalized.
-// const token = localStorage.getItem('token');
-// const tenantId = localStorage.getItem('tenantId');
+export const AUTH_TOKEN_STORAGE_KEY = 'admin-template:token';
+export const TENANT_ID_STORAGE_KEY = 'admin-template:tenant-id';
 ```
 
-Keep this logic in request interceptors. Do not add token, tenant, trace, or authorization handling inside individual page components.
+When present, request interceptors attach:
+
+- `Authorization: Bearer <token>`
+- `X-Tenant-Id: <tenant-id>`
+
+Business projects may rename the keys or replace the storage source when the login model is finalized. Keep this logic in request interceptors. Do not add token, tenant, trace, or authorization handling inside individual page components.
 
 ## OpenAPI
 
